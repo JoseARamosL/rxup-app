@@ -25,7 +25,7 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Instalar dependencias de producción
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Permisos para Symfony
 RUN chown -R www-data:www-data /var/www/html/var
