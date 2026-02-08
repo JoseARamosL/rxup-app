@@ -8,34 +8,25 @@
         {% block stylesheets %}{% endblock %}
     </head>
     <body class="bg-gray-50 text-gray-900">
-        <nav class="bg-white shadow-sm border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16 items-center">
-                    <div class="flex items-center">
-                        <a href="{{ path('app_tournament_index') }}" class="text-xl font-bold text-indigo-600 tracking-tighter">
-                            RXUP PADEL
-                        </a>
-                    </div>
+        <nav class="bg-white border-b border-gray-100 px-4 py-4">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <a href="{{ path('app_home') }}" class="font-black text-xl tracking-tighter text-indigo-600">RXUP PADEL</a>
 
-                    <div class="flex items-center space-x-4">
-                        {% if app.user %}
-                            <span class="text-sm text-gray-500">
-                                Hola, <span class="font-semibold text-gray-700">{{ app.user.userIdentifier }}</span>
-                            </span>
+                <div class="space-x-6 flex items-center">
+                    {% if app.user %}
+                        <a href="{{ path('app_tournament_index') }}" class="text-sm font-bold text-gray-600 hover:text-indigo-600">Torneos</a>
+                        <a href="{{ path('app_my_games') }}" class="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl">🎾 Mis Partidos</a>
 
-                            {% if is_granted('ROLE_ADMIN') %}
-                                <a href="{{ path('app_admin_tournament_index') }}" class="text-xs bg-gray-100 hover:bg-gray-200 py-1 px-3 rounded text-gray-600">Admin</a>
-                            {% endif %}
-
-                            <a href="{{ path('app_logout') }}" class="text-sm font-medium text-red-600 hover:text-red-500 transition">
-                                Cerrar Sesión
-                            </a>
-                        {% else %}
-                            <a href="{{ path('app_login') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                                Iniciar Sesión
-                            </a>
+                        {# Si es Admin, mostramos enlace al panel #}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('app_admin_tournament_index') }}" class="text-sm font-bold text-red-500">Panel Admin</a>
                         {% endif %}
-                    </div>
+
+                        <span class="text-xs text-gray-400">{{ app.user.name }}</span>
+                        <a href="{{ path('app_logout') }}" class="text-xs text-gray-400 hover:text-red-500">Salir</a>
+                    {% else %}
+                        <a href="{{ path('app_login') }}" class="text-sm font-bold text-indigo-600">Entrar</a>
+                    {% endif %}
                 </div>
             </div>
         </nav>

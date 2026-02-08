@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ tournament.name }}{% endblock %}
+
+{% block body %}
+<div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+
+    {# Cabecera del Torneo #}
+    <div class="mb-8">
+        <div class="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest mb-2">
+            <span>{{ tournament.type == 'LEAGUE' ? '🏆 Liga' : '🎾 Torneo' }}</span>
+            {% if tournament.isActive %}
+                <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px]">En curso</span>
+            {% endif %}
+        </div>
+        <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">{{ tournament.name }}</h1>
+    </div>
+
+    {# Pestañas (Tabs) con Alpine.js o CSS Simple. Aquí usaremos un sistema limpio de botones #}
+    <div x-data="{ tab: 'calendar' }" class="space-y-6">
+        <div class="flex p-1 bg-gray-100 rounded-2xl sm:w-max">
+            <button @click="tab = 'calendar'" :class="tab === 'calendar' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
+                Calendario
+            </button>
+            {% if tournament.hasRanking %}
+            <button @click="tab = 'ranking'" :class="tab === 'ranking' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
+                Clasificación
+            </button>
+            {% endif %}
+            <button @click="tab = 'rules'" :class="tab === 'rules' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
+                Normativa
+            </button>
+        </div>
+
+        {# SECCIÓN CALENDARIO #}
+        <div x-show="tab === 'calendar'" class="space-y-8 animate-fade-in">
+            {% for phase, phaseGames in groupedGames %}
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-gray-50/50 px-6 py-4 border-b border-gray-100">
+                        <h3 class="font-black text-gray-400 uppercase text-xs tracking-widest">{{ phase }}</h3>
+                    </div>
+                    <div class="divide-y divide-gray-100">
+                        {% for game in phaseGames %}
+                            <div class="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                                <div class="flex items-center space-x-4 md:space-x-12 text-center">
+                                    <div class="w-32">
+                                        <p class="font-bold text-gray-900 text-sm md:text-base">{{ game.player1.name|default('TBD') }}</p>
+                                        <p class="font-bold text-gray-900 text-sm md:text-base">{{ game.player2.name|default('TBD') }}</p>
+                                    </div>
+
+                                    <div class="flex flex-col items-center">
+                                        {% if game.score %}
+                                            <div class="bg-gray-900 text-white px-3 py-1.5 rounded-lg font-mono text-lg shadow-lg">
+                                                {{ game.score }}
+                                            </div>
+                                        {% else %}
+                                            <div class="text-indigo-200 font-black text-xl italic px-4">VS</div>
+                                        {% endif %}
+                                        <span class="text-[9px] uppercase font-bold text-gray-400 mt-2">
+                                            {{ game.date ? game.date|date('d/m H:i') : 'Por definir' }}
+                                        </span>
+                                    </div>
+
+                                    <div class="w-32">
+                                        <p class="font-bold text-gray-900 text-sm md:text-base">{{ game.player3.name|default('TBD') }}</p>
+                                        <p class="font-bold text-gray-900 text-sm md:text-base">{{ game.player4.name|default('TBD') }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-gray-400 bg-gray-50 px-3 py-1 rounded-full">
+                                    Pista: {{ game.court|default('Principal') }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center py-20 text-gray-400 italic">No hay partidos programados todavía.</p>
+            {% endfor %}
+        </div>
+
+        {# SECCIÓN CLASIFICACIÓN #}
+        {% if tournament.hasRanking %}
+        <div x-show="tab === 'ranking'" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden animate-fade-in">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                        <tr>
+                            <th class="px-6 py-4 text-left">Pareja</th>
+                            <th class="px-2 py-4">Pts</th>
+                            <th class="px-2 py-4">PJ</th>
+                            <th class="px-2 py-4">PG</th>
+                            <th class="px-2 py-4">DF</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 text-sm">
+                        {% for team, data in stats %}
+                            <tr class="{{ loop.index <= 3 ? 'bg-indigo-50/20' : '' }}">
+                                <td class="px-6 py-4 font-bold text-gray-900">
+                                    <span class="text-gray-300 mr-2 italic">{{ loop.index }}º</span> {{ team }}
+                                </td>
+                                <td class="px-2 py-4 text-center font-black text-indigo-600">{{ data.points }}</td>
+                                <td class="px-2 py-4 text-center text-gray-500">{{ data.pj }}</td>
+                                <td class="px-2 py-4 text-center text-gray-500">{{ data.pg }}</td>
+                                <td class="px-2 py-4 text-center font-bold {{ data.df >= 0 ? 'text-green-600' : 'text-red-400' }}">
+                                    {{ data.df > 0 ? '+' : '' }}{{ data.df }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {# SECCIÓN NORMATIVA #}
+        <div x-show="tab === 'rules'" class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 prose max-w-none animate-fade-in">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Normas del Torneo</h2>
+            <div class="text-gray-600 leading-relaxed whitespace-pre-wrap">
+                {{ tournament.description ?: 'No se ha especificado normativa para este torneo.' }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Incluimos Alpine.js para que las pestañas funcionen sin recargar #}
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+{% endblock %}

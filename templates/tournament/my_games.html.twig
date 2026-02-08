@@ -1,0 +1,77 @@
+{# templates/tournament/my_games.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Mis Partidos{% endblock %}
+
+{% block body %}
+<div class="max-w-5xl mx-auto py-10 px-4">
+    <h1 class="text-4xl font-black text-gray-900 mb-10 tracking-tight">🎾 Mi Agenda de Pádel</h1>
+
+    {# SECCIÓN: PRÓXIMOS PARTIDOS #}
+    <div class="mb-12">
+        <h2 class="flex items-center text-sm font-black text-indigo-600 uppercase tracking-[0.2em] mb-6">
+            <span class="bg-indigo-600 w-2 h-2 rounded-full mr-2 animate-pulse"></span>
+            Próximos Retos
+        </h2>
+
+        <div class="space-y-4">
+            {% for game in upcomingGames %}
+                <div class="bg-white rounded-3xl shadow-xl shadow-indigo-100/50 border border-indigo-50 overflow-hidden group">
+                    <div class="bg-indigo-600 px-6 py-2 text-white text-[10px] font-bold uppercase flex justify-between">
+                        <span>{{ game.tournament.name }} • {{ game.phase }}</span>
+                        <span>{{ game.date ? game.date|date('d/m/Y H:i') : 'Horario por confirmar' }}</span>
+                    </div>
+                    <div class="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div class="flex items-center space-x-12 text-center">
+                            <div class="w-36">
+                                <p class="text-lg {{ game.player1 == app.user ? 'text-indigo-600 font-black' : 'text-gray-900 font-bold' }}">{{ game.player1.name }}</p>
+                                <p class="text-lg {{ game.player2 == app.user ? 'text-indigo-600 font-black' : 'text-gray-900 font-bold' }}">{{ game.player2.name }}</p>
+                            </div>
+                            <div class="text-indigo-200 font-black text-3xl italic">VS</div>
+                            <div class="w-36">
+                                <p class="text-lg {{ game.player3 == app.user ? 'text-indigo-600 font-black' : 'text-gray-900 font-bold' }}">{{ game.player3.name }}</p>
+                                <p class="text-lg {{ game.player4 == app.user ? 'text-indigo-600 font-black' : 'text-gray-900 font-bold' }}">{{ game.player4.name }}</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 rounded-2xl p-4 text-center min-w-[140px]">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase">Pista</p>
+                            <p class="text-indigo-900 font-black">{{ game.court|default('Principal') }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-gray-400 italic bg-gray-50 p-6 rounded-2xl border-2 border-dashed text-center">No tienes partidos pendientes.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    {# SECCIÓN: HISTORIAL #}
+    <div>
+        <h2 class="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Historial Reciente</h2>
+        <div class="space-y-3">
+            {% for game in pastGames %}
+                <div class="bg-gray-50/50 rounded-2xl p-5 border border-gray-100 flex flex-wrap items-center justify-between gap-4 opacity-80 hover:opacity-100 transition">
+                    <div class="flex items-center gap-6">
+                        <div class="bg-gray-900 text-white px-3 py-1 rounded font-mono text-sm shadow-sm">
+                            {{ game.score }}
+                        </div>
+                        <div class="text-xs">
+                            <span class="font-bold text-gray-800">{{ game.player1.name }}/{{ game.player2.name }}</span>
+                            <span class="text-gray-400 mx-1">vs</span>
+                            <span class="font-bold text-gray-800">{{ game.player3.name }}/{{ game.player4.name }}</span>
+                        </div>
+                    </div>
+                    <div class="text-[10px] font-bold text-gray-400 uppercase text-right">
+                        <div class="text-indigo-500 font-black tracking-widest mb-0.5">
+                            {{ game.phase }}
+                        </div>
+                        <div>
+                            {{ game.tournament.name }} • {{ game.date|date('d M') }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
