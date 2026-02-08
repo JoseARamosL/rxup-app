@@ -27,7 +27,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Instalar dependencias de producción
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Permisos para Symfony
-RUN chown -R www-data:www-data /var/www/html/var
+# Creamos la carpeta var (por si no existe) y le damos permisos de escritura al usuario de Apache
+RUN mkdir -p /var/www/html/var && \
+    chown -R www-data:www-data /var/www/html/var && \
+    chmod -R 775 /var/www/html/var
 
 EXPOSE 80
