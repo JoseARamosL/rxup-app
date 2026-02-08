@@ -38,15 +38,14 @@ class GameType extends AbstractType
                 'widget' => 'single_text',
                 'required' => false
             ])
-            ->add('scoreTeamA', TextType::class, [
-                'label' => 'Resultado Pareja Local (A)',
+            ->add('score', TextType::class, [
+                'label' => 'Resultado del Partido',
                 'required' => false,
-                'attr' => ['placeholder' => 'Ej: 6-4 / 7-5']
-            ])
-            ->add('scoreTeamB', TextType::class, [
-                'label' => 'Resultado Pareja Visitante (B)',
-                'required' => false,
-                'attr' => ['placeholder' => 'Ej: 4-6 / 5-7']
+                'attr' => [
+                    'placeholder' => 'Ej: 6-2, 2-6, 6-4',
+                    'class' => 'text-center font-mono'
+                ],
+                'help' => 'Usa guiones para los sets y comas para separarlos.'
             ])
         ;
     }

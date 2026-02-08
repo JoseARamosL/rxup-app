@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class TournamentController extends AbstractController
 {
-    #[Route('/', name: 'app_tournament_index')]
+    #[Route('/torneos', name: 'app_tournament_index')]
     public function index(TournamentRepository $repository): Response
     {
         // Aquí el usuario verá todos los torneos disponibles

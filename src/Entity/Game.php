@@ -29,12 +29,6 @@ class Game
     #[ORM\ManyToOne]
     private ?User $player4 = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
-    private ?string $scoreTeamA = null;
-
-    #[ORM\Column(length: 20, nullable: true)]
-    private ?string $scoreTeamB = null;
-
     #[ORM\Column(nullable: true)]
     private ?\DateTime $date = null;
 
@@ -43,6 +37,9 @@ class Game
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $phase = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $score = null;
 
     public function getId(): ?int
     {
@@ -109,30 +106,6 @@ class Game
         return $this;
     }
 
-    public function getScoreTeamA(): ?string
-    {
-        return $this->scoreTeamA;
-    }
-
-    public function setScoreTeamA(?string $scoreTeamA): static
-    {
-        $this->scoreTeamA = $scoreTeamA;
-
-        return $this;
-    }
-
-    public function getScoreTeamB(): ?string
-    {
-        return $this->scoreTeamB;
-    }
-
-    public function setScoreTeamB(?string $scoreTeamB): static
-    {
-        $this->scoreTeamB = $scoreTeamB;
-
-        return $this;
-    }
-
     public function getDate(): ?\DateTime
     {
         return $this->date;
@@ -165,6 +138,18 @@ class Game
     public function setPhase(?string $phase): static
     {
         $this->phase = $phase;
+
+        return $this;
+    }
+
+    public function getScore(): ?string
+    {
+        return $this->score;
+    }
+
+    public function setScore(?string $score): static
+    {
+        $this->score = $score;
 
         return $this;
     }

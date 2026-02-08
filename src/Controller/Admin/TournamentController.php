@@ -43,4 +43,40 @@ class TournamentController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/{id}/edit', name: 'app_admin_tournament_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Tournament $tournament, EntityManagerInterface $entityManager): Response
+    {
+        // Reutilizamos el mismo formulario que usamos para crear
+        $form = $this->createForm(TournamentType::class, $tournament);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Al ser un objeto que ya viene de la base de datos (por el id),
+            // solo necesitamos hacer flush para guardar los cambios.
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Torneo actualizado correctamente.');
+
+            return $this->redirectToRoute('app_admin_tournament_index');
+        }
+
+        return $this->render('admin/tournament/edit.html.twig', [
+            'tournament' => $tournament,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}/delete', name: 'app_admin_tournament_delete', methods: ['POST'])]
+    public function delete(Request $request, Tournament $tournament, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$tournament->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($tournament);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Torneo eliminado definitivamente.');
+        }
+
+        return $this->redirectToRoute('app_admin_tournament_index');
+    }
 }

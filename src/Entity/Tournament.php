@@ -31,8 +31,11 @@ class Tournament
     /**
      * @var Collection<int, Game>
      */
-    #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'tournament')]
+    #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'tournament', orphanRemoval: true)]
     private Collection $games;
+
+    #[ORM\Column]
+    private ?bool $hasRanking = true;
 
     public function __construct()
     {
@@ -118,6 +121,18 @@ class Tournament
                 $game->setTournament(null);
             }
         }
+
+        return $this;
+    }
+
+    public function hasRanking(): ?bool
+    {
+        return $this->hasRanking;
+    }
+
+    public function setHasRanking(bool $hasRanking): static
+    {
+        $this->hasRanking = $hasRanking;
 
         return $this;
     }

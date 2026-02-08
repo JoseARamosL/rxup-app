@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class TournamentType extends AbstractType
 {
@@ -30,6 +31,12 @@ class TournamentType extends AbstractType
                 'label' => 'Normativa y detalles',
                 'required' => false,
                 'attr' => ['rows' => 5]
+            ])
+            ->add('hasRanking', CheckboxType::class, [
+                'label' => '¿Activar Clasificación Automática?',
+                'required' => false,
+                'data' => true, // Marcado por defecto
+                'attr' => ['class' => 'rounded text-indigo-600 focus:ring-indigo-500']
             ])
         ;
     }

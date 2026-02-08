@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Form\GameType;
+use App\Service\RankingCalculator;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route('/admin/tournament/{id}/games')]
@@ -59,8 +60,8 @@ class GameController extends AbstractController
     public function edit(
         Request $request,
         #[MapEntity(id: 'gameId')] Game $game,
-        EntityManagerInterface $entityManager
-    ): Response {
+        EntityManagerInterface $entityManager): Response
+    {
         $form = $this->createForm(GameType::class, $game);
         $form->handleRequest($request);
 
@@ -75,5 +76,40 @@ class GameController extends AbstractController
             'game' => $game,
             'form' => $form,
         ]);
+    }
+
+    #[Route('/ranking', name: 'app_admin_tournament_ranking', methods: ['GET'])]
+    public function ranking(Tournament $tournament, RankingCalculator $calculator): Response
+    {
+        // Si el torneo no tiene clasificación, redirigimos al calendario con un mensaje
+        if (!$tournament->hasRanking()) {
+            $this->addFlash('warning', 'Este torneo no tiene activada la clasificación.');
+            return $this->redirectToRoute('app_admin_game_index', ['id' => $tournament->getId()]);
+        }
+
+        $stats = $calculator->calculate($tournament);
+
+        return $this->render('admin/tournament/ranking.html.twig', [
+            'tournament' => $tournament,
+            'stats' => $stats,
+        ]);
+    }
+
+    #[Route('/{gameId}/delete', name: 'app_admin_game_delete', methods: ['POST'])]
+    public function delete(
+        Request $request,
+        #[MapEntity(id: 'gameId')] Game $game,
+        EntityManagerInterface $entityManager): Response
+    {
+        $tournamentId = $game->getTournament()->getId();
+
+        // Verificamos el token de seguridad para evitar borrados accidentales o malintencionados
+        if ($this->isCsrfTokenValid('delete'.$game->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($game);
+            $entityManager->flush();
+            $this->addFlash('success', 'Partido eliminado correctamente.');
+        }
+
+        return $this->redirectToRoute('app_admin_game_index', ['id' => $tournamentId]);
     }
 }
