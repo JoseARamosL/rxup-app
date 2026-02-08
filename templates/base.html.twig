@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Padel App{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.tailwindcss.com"></script>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body class="bg-gray-50 text-gray-900">
+        <nav class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16 items-center">
+                    <div class="flex items-center">
+                        <a href="{{ path('app_tournament_index') }}" class="text-xl font-bold text-indigo-600 tracking-tighter">
+                            RXUP PADEL
+                        </a>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        {% if app.user %}
+                            <span class="text-sm text-gray-500">
+                                Hola, <span class="font-semibold text-gray-700">{{ app.user.userIdentifier }}</span>
+                            </span>
+
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a href="{{ path('app_admin_tournament_index') }}" class="text-xs bg-gray-100 hover:bg-gray-200 py-1 px-3 rounded text-gray-600">Admin</a>
+                            {% endif %}
+
+                            <a href="{{ path('app_logout') }}" class="text-sm font-medium text-red-600 hover:text-red-500 transition">
+                                Cerrar Sesión
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_login') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                Iniciar Sesión
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main>
+            {% block body %}{% endblock %}
+            {% block javascripts %}{% endblock %}
+        </main>
+    </body>
+</html>
+

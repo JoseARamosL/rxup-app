@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Torneos de Padel{% endblock %}
+
+{% block body %}
+<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center mb-10">
+        <h1 class="text-4xl font-extrabold text-gray-900">Torneos y Ligas</h1>
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_admin_tournament_index') }}" class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-700 transition">
+                PANEL ADMIN
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for tournament in tournaments %}
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition">
+                <div class="p-6">
+                    <span class="text-xs font-bold uppercase tracking-wider {{ tournament.type == 'LEAGUE' ? 'text-blue-600' : 'text-purple-600' }}">
+                        {{ tournament.type == 'LEAGUE' ? 'Liga' : 'Torneo' }}
+                    </span>
+                    <h2 class="text-xl font-bold text-gray-900 mt-2">{{ tournament.name }}</h2>
+                    <p class="text-gray-500 mt-3 text-sm line-clamp-3">
+                        {{ tournament.description ?: 'Sin descripción disponible.' }}
+                    </p>
+                    <div class="mt-6">
+                        <a href="#" class="block text-center bg-indigo-50 text-indigo-700 font-bold py-2 rounded-xl hover:bg-indigo-100 transition">
+                            Ver Detalles
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-span-full text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200">
+                <p class="text-gray-400">No hay competiciones activas en este momento.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
