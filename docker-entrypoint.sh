@@ -19,5 +19,17 @@ php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migratio
 chmod -R 777 /var/www/html/var
 chown -R www-data:www-data /var/www/html/var
 
+echo "Limpiando y regenerando metadatos de Doctrine..."
+# Borramos carpetas de caché a mano primero
+rm -rf /var/www/html/var/cache/prod/*
+
+# Comandos oficiales de limpieza
+php bin/console doctrine:cache:clear-metadata --env=prod
+php bin/console doctrine:cache:clear-query --env=prod
+php bin/console doctrine:cache:clear-result --env=prod
+
+# Forzamos el calentamiento de la caché para que Doctrine lea la DB ahora mismo
+php bin/console cache:warmup --env=prod
+
 echo "Arrancando Apache..."
 exec apache2-foreground
