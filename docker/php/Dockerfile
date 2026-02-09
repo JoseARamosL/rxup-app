@@ -1,12 +1,13 @@
 FROM php:8.3-fpm
 
-# Instalar dependencias del sistema
+# Instalar dependencias del sistema y extensiones de PHP
 RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
+    libpq-dev \
     libicu-dev \
     libzip-dev \
-    && docker-php-ext-install intl pdo pdo_mysql zip
+    zip \
+    unzip \
+    && docker-php-ext-install intl pdo_pgsql zip
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
