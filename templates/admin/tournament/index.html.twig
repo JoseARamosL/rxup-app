@@ -3,75 +3,119 @@
 {% block title %}Gestión de Torneos{% endblock %}
 
 {% block body %}
-<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center mb-8">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900">Gestión de Torneos</h1>
-            <p class="mt-2 text-sm text-gray-600">Administra tus ligas y torneos eliminatorios de pádel.</p>
+    <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+
+        {# Header Adaptable #}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+            <div>
+                <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter">Gestión de Torneos</h1>
+                <p class="mt-1 text-sm text-gray-500 font-medium">Administra tus ligas y eliminatorias oficiales.</p>
+            </div>
+            <a href="{{ path('app_admin_tournament_new') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-xs font-black rounded-2xl shadow-xl text-white bg-indigo-600 hover:bg-indigo-700 transition-all uppercase tracking-widest">
+                <i class="fas fa-plus mr-2"></i> Nuevo Torneo
+            </a>
         </div>
-        <a href="{{ path('app_admin_tournament_new') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
-            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Torneo
-        </a>
-    </div>
 
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+        {# Contenedor de Tabla / Cards #}
+        <div class="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[2.5rem] overflow-hidden border border-gray-100">
+
+            {# Vista Escritorio: Tabla (Visible desde 'md') #}
+            <div class="hidden md:block">
+                <table class="min-w-full divide-y divide-gray-100">
+                    <thead class="bg-gray-50/50">
+                    <tr>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Torneo</th>
+                        <th class="px-6 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Configuración</th>
+                        <th class="px-6 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Estado</th>
+                        <th class="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 bg-white">
+                    {% for tournament in tournaments %}
+                        <tr class="hover:bg-gray-50/50 transition-colors">
+                            <td class="px-8 py-6">
+                                <span class="text-sm font-black text-gray-900 uppercase tracking-tight">{{ tournament.name }}</span>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg {{ tournament.type == 'LEAGUE' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600' }}">
+                                    {{ tournament.type == 'LEAGUE' ? 'Liga' : 'Torneo' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-6">
+                                {% if tournament.active %}
+                                    <span class="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-50 px-3 py-1 rounded-lg">
+                                        <span class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-2 animate-pulse"></span> Activo
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-red-400 bg-red-50 px-3 py-1 rounded-lg">
+                                        <span class="h-1.5 w-1.5 bg-red-400 rounded-full mr-2"></span> Inactivo
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-6 text-right space-x-2">
+                                <a href="{{ path('app_admin_game_index', {'id': tournament.id}) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-[10px] font-black rounded-xl hover:bg-indigo-700 transition-all uppercase tracking-widest shadow-lg shadow-indigo-100">
+                                    Gestionar
+                                </a>
+                                <a href="{{ path('app_admin_tournament_edit', {'id': tournament.id}) }}" class="inline-flex items-center px-4 py-2 bg-gray-50 text-gray-400 text-[10px] font-black rounded-xl hover:bg-gray-100 transition-all uppercase tracking-widest">
+                                    Editar
+                                </a>
+                                <form method="post" action="{{ path('app_admin_tournament_delete', {'id': tournament.id}) }}" onsubmit="return confirm('¿Borrar torneo? Esto eliminará todos los partidos.');" class="inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tournament.id) }}">
+                                    <button class="p-2 text-red-200 hover:text-red-500 transition-colors">
+                                        <i class="fas fa-trash-alt text-sm"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {# Vista Móvil: Cards (Oculto en 'md') #}
+            <div class="md:hidden divide-y divide-gray-100">
                 {% for tournament in tournaments %}
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ tournament.name }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ tournament.type == 'LEAGUE' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' }}">
-                                {{ tournament.type == 'LEAGUE' ? 'Liga' : 'Torneo' }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {% if tournament.active %}
-                                <span class="text-green-600 flex items-center">
-                                    <span class="h-2 w-2 bg-green-600 rounded-full mr-2"></span> Activo
-                                </span>
-                            {% else %}
-                                <span class="text-red-600 flex items-center">
-                                    <span class="h-2 w-2 bg-red-600 rounded-full mr-2"></span> Inactivo
-                                </span>
-                            {% endif %}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end items-center space-x-3">
-                            <a href="{{ path('app_admin_game_index', {'id': tournament.id}) }}" class="text-indigo-600 hover:text-indigo-900 font-bold">Gestionar</a>
-                            <a href="{{ path('app_admin_tournament_edit', {'id': tournament.id}) }}" class="text-gray-400 hover:text-gray-600">Editar</a>
+                    <div class="p-6 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Nombre del Torneo</p>
+                                <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight">{{ tournament.name }}</h3>
+                            </div>
+                            <span class="px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-lg {{ tournament.type == 'LEAGUE' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600' }}">
+                            {{ tournament.type == 'LEAGUE' ? 'Liga' : 'Torneo' }}
+                        </span>
+                        </div>
 
-                            <form method="post" action="{{ path('app_admin_tournament_delete', {'id': tournament.id}) }}" onsubmit="return confirm('¿Estás seguro? Se borrarán todos los partidos y datos de este torneo.');" class="inline">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tournament.id) }}">
-                                <button class="text-red-400 hover:text-red-600 transition">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
+                        <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
+                            <div class="flex flex-col">
+                                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Estado</span>
+                                <span class="text-xs font-black uppercase {{ tournament.active ? 'text-emerald-500' : 'text-red-400' }}">
+                                {{ tournament.active ? '✓ Activo' : '✗ Inactivo' }}
+                            </span>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="{{ path('app_admin_tournament_edit', {'id': tournament.id}) }}" class="p-3 bg-white border border-gray-200 text-gray-400 rounded-xl">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="post" action="{{ path('app_admin_tournament_delete', {'id': tournament.id}) }}" onsubmit="return confirm('¿Borrar?');" class="inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tournament.id) }}">
+                                    <button class="p-3 bg-white border border-red-50 text-red-300 rounded-xl">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <a href="{{ path('app_admin_game_index', {'id': tournament.id}) }}" class="w-full inline-flex items-center justify-center px-6 py-4 bg-indigo-600 text-white text-xs font-black rounded-2xl shadow-lg shadow-indigo-100 uppercase tracking-[0.2em]">
+                            Gestionar Partidos
+                        </a>
+                    </div>
                 {% else %}
-                    <tr>
-                        <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500 italic">
-                            No hay torneos creados todavía. ¡Crea el primero!
-                        </td>
-                    </tr>
+                    <div class="p-12 text-center">
+                        <p class="text-gray-400 italic text-sm font-medium">No hay torneos todavía.</p>
+                    </div>
                 {% endfor %}
-            </tbody>
-        </table>
+            </div>
+        </div>
     </div>
-</div>
 {% endblock %}

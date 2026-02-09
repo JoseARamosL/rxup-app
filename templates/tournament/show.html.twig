@@ -3,167 +3,227 @@
 {% block title %}{{ tournament.name }}{% endblock %}
 
 {% block body %}
-<div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto py-6 md:py-10 px-4 sm:px-6 lg:px-8">
 
-    {# Cabecera del Torneo #}
-    <div class="mb-8">
-        <div class="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest mb-2">
-            <span>{{ tournament.type == 'LEAGUE' ? '🏆 Liga' : '🎾 Torneo' }}</span>
-            {% if tournament.isActive %}
-                <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px]">En curso</span>
-            {% endif %}
-        </div>
-        <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">{{ tournament.name }}</h1>
-    </div>
-
-    {# Pestañas (Tabs) con Alpine.js o CSS Simple. Aquí usaremos un sistema limpio de botones #}
-    <div x-data="{ tab: 'calendar' }" class="space-y-6">
-        <div class="flex p-1 bg-gray-100 rounded-2xl sm:w-max">
-            <button @click="tab = 'calendar'" :class="tab === 'calendar' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
-                Calendario
-            </button>
-            {% if tournament.hasRanking %}
-            <button @click="tab = 'ranking'" :class="tab === 'ranking' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
-                Clasificación
-            </button>
-            {% endif %}
-            <button @click="tab = 'rules'" :class="tab === 'rules' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
-                Normativa
-            </button>
+        {# Cabecera del Torneo #}
+        <div class="mb-8">
+            <div class="flex items-center gap-3 text-indigo-600 font-black text-[10px] uppercase tracking-[0.3em] mb-3">
+            <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg">
+                {{ tournament.type == 'LEAGUE' ? '🏆 LIGA' : '🎾 TORNEO' }}
+            </span>
+                {% if tournament.isActive %}
+                    <span class="flex items-center gap-1.5 text-emerald-500">
+                    <span class="h-2 w-2 bg-emerald-500 rounded-full animate-pulse"></span> EN CURSO
+                </span>
+                {% endif %}
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase leading-tight">{{ tournament.name }}</h1>
         </div>
 
-        {# SECCIÓN CALENDARIO (Con Acordeones) #}
-        <div x-show="tab === 'calendar'" class="space-y-4 animate-fade-in">
-            {% for phase, phaseGames in groupedGames %}
-                {# Cada fase es un acordeón independiente. 'open' controla si empieza abierto o cerrado #}
-                <div x-data="{ open: {{ loop.first ? 'true' : 'false' }} }" class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
+        {# Pestañas (Tabs) #}
+        <div x-data="{ tab: 'calendar' }" class="space-y-6">
+            <div class="flex p-1.5 bg-gray-100 rounded-[1.5rem] w-full sm:w-max">
+                <button @click="tab = 'calendar'" :class="tab === 'calendar' ? 'bg-white shadow-md text-indigo-600 scale-105' : 'text-gray-500 hover:text-gray-700'" class="flex-1 sm:flex-none px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300">
+                    Calendario
+                </button>
+                {% if tournament.hasRanking %}
+                    <button @click="tab = 'ranking'" :class="tab === 'ranking' ? 'bg-white shadow-md text-indigo-600 scale-105' : 'text-gray-500 hover:text-gray-700'" class="flex-1 sm:flex-none px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300">
+                        Ranking
+                    </button>
+                {% endif %}
+                <button @click="tab = 'rules'" :class="tab === 'rules' ? 'bg-white shadow-md text-indigo-600 scale-105' : 'text-gray-500 hover:text-gray-700'" class="flex-1 sm:flex-none px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300">
+                    Normas
+                </button>
+            </div>
 
-                    {# Cabecera del Acordeón (Clickable) #}
-                    <button @click="open = !open"
-                            class="w-full flex items-center justify-between px-8 py-5 bg-gray-50/50 hover:bg-gray-50 transition-colors group">
-                        <div class="flex items-center gap-4">
-                            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-black">
+            {# SECCIÓN CALENDARIO #}
+            <div x-show="tab === 'calendar'" class="space-y-4 animate-fade-in">
+                {% for phase, phaseGames in groupedGames %}
+                    <div x-data="{ open: {{ loop.first ? 'true' : 'false' }} }" class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
+                        <button @click="open = !open" class="w-full flex items-center justify-between px-6 py-5 bg-gray-50/50 hover:bg-gray-50 transition-colors group">
+                            <div class="flex items-center gap-4">
+                            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-600 text-white text-[10px] font-black shadow-lg shadow-indigo-100">
                                 {{ loop.index }}
                             </span>
-                            <h3 class="font-black text-gray-700 uppercase text-xs tracking-[0.2em]">{{ phase }}</h3>
-                        </div>
-
-                        {# Icono indicador (Flecha que gira) #}
-                        <div class="text-gray-300 group-hover:text-indigo-500 transition-all duration-300"
-                            :class="open ? 'rotate-180' : ''">
-                            <i class="fas fa-chevron-down text-xs"></i>
-                        </div>
-                    </button>
-
-                    {# Contenido del Acordeón (Partidos) #}
-                    <div x-show="open"
-                        x-collapse
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 transform -translate-y-2"
-                        x-transition:enter-end="opacity-100 transform translate-y-0"
-                        class="divide-y divide-gray-50 border-t border-gray-100">
-
-                        {% for game in phaseGames %}
-                            <div class="p-6 flex flex-col md:flex-row items-center justify-between gap-6 hover:bg-gray-50/30 transition-colors">
-                                <div class="flex items-center space-x-4 md:space-x-12 text-center">
-
-                                    {# Pareja Local #}
-                                    <div class="w-40">
-                                        {% if game.team1 %}
-                                            <p class="font-black text-gray-900 text-sm uppercase tracking-tighter">{{ game.team1.player1.name }}</p>
-                                            <p class="font-bold text-indigo-500 text-[11px] uppercase tracking-tighter">{{ game.team1.player2.name }}</p>
-                                        {% else %}
-                                            <p class="text-gray-400 italic text-sm font-bold">TBD</p>
-                                        {% endif %}
-                                    </div>
-
-                                    {# Score / VS #}
-                                    <div class="flex flex-col items-center min-w-[100px]">
-                                        {% if game.score %}
-                                            <div class="bg-gray-900 text-white px-4 py-1.5 rounded-xl font-mono text-lg shadow-lg border-b-2 border-indigo-500">
-                                                {{ game.score }}
-                                            </div>
-                                        {% else %}
-                                            <div class="text-indigo-100 font-black text-2xl italic px-4">VS</div>
-                                        {% endif %}
-                                        <span class="text-[9px] uppercase font-black text-gray-400 mt-2 tracking-widest">
-                                            {{ game.date ? game.date|date('d/m H:i') : 'Por definir' }}
-                                        </span>
-                                    </div>
-
-                                    {# Pareja Visitante #}
-                                    <div class="w-40">
-                                        {% if game.team2 %}
-                                            <p class="font-black text-gray-900 text-sm uppercase tracking-tighter">{{ game.team2.player1.name }}</p>
-                                            <p class="font-bold text-indigo-500 text-[11px] uppercase tracking-tighter">{{ game.team2.player2.name }}</p>
-                                        {% else %}
-                                            <p class="text-gray-400 italic text-sm font-bold">TBD</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-
-                                {# Detalles extra #}
-                                <div class="flex items-center gap-3">
-                                    <div class="text-[10px] text-gray-400 bg-gray-50 px-4 py-1.5 rounded-xl border border-gray-100 font-black uppercase tracking-widest">
-                                        Pista: {{ game.court|default('Principal') }}
-                                    </div>
-                                </div>
+                                <h3 class="font-black text-gray-700 uppercase text-[11px] tracking-widest">{{ phase }}</h3>
                             </div>
-                        {% endfor %}
+                            <i class="fas fa-chevron-down text-gray-300 text-xs transition-transform duration-300" :class="open ? 'rotate-180 text-indigo-600' : ''"></i>
+                        </button>
+
+                        <div x-show="open" x-collapse class="divide-y divide-gray-50 border-t border-gray-100">
+                            {% for game in phaseGames %}
+                                <div class="p-5 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 hover:bg-gray-50/30 transition-colors">
+                                    <div class="flex items-center justify-between w-full md:w-auto md:space-x-12 text-center">
+                                        {# Pareja Local #}
+                                        <div class="flex-1 md:w-40 text-center">
+                                            {% if game.team1 %}
+                                                <p class="font-black text-gray-900 text-[11px] md:text-sm uppercase tracking-tight">{{ game.team1.player1.name }}</p>
+                                                <p class="font-black text-gray-900 text-[11px] md:text-sm uppercase tracking-tight">{{ game.team1.player2.name }}</p>
+                                            {% else %}
+                                                <p class="text-gray-400 italic text-xs font-bold">POR DEFINIR</p>
+                                            {% endif %}
+                                        </div>
+
+                                        {# VS / Score #}
+                                        <div class="flex flex-col items-center px-4">
+                                            {% if game.score %}
+                                                <div class="bg-gray-900 text-white px-4 py-1.5 rounded-xl font-mono text-lg shadow-lg border-b-2 border-indigo-500">
+                                                    {{ game.score }}
+                                                </div>
+                                            {% else %}
+                                                <div class="text-indigo-100 font-black text-2xl italic">VS</div>
+                                            {% endif %}
+                                            <span class="text-[8px] uppercase font-black text-gray-400 mt-2 tracking-[0.2em]">
+                                            {{ game.date ? game.date|date('d/m H:i') : 'PDTE' }}
+                                        </span>
+                                        </div>
+
+                                        {# Pareja Visitante #}
+                                        <div class="flex-1 md:w-40 text-center">
+                                            {% if game.team2 %}
+                                                <p class="font-black text-gray-900 text-[11px] md:text-sm uppercase tracking-tight">{{ game.team2.player1.name }}</p>
+                                                <p class="font-black text-gray-900 text-[11px] md:text-sm uppercase tracking-tight">{{ game.team2.player2.name }}</p>
+                                            {% else %}
+                                                <p class="text-gray-400 italic text-xs font-bold">POR DEFINIR</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="w-full md:w-auto text-center md:text-right">
+                                    <span class="text-[9px] text-gray-400 font-black uppercase tracking-widest bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
+                                        Pista: {{ game.court|default('TBD') }}
+                                    </span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# SECCIÓN CLASIFICACIÓN #}
+            {% if tournament.hasRanking %}
+                <div x-show="tab === 'ranking'" class="animate-fade-in space-y-4">
+
+                    {# LEYENDA INFORMATIVA (Nueva) #}
+                    <div class="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4 flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                            <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Pts: Puntos</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                            <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">PJ: Jugados</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">PG: Ganados</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">PE: Empatados</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                            <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">PP: Perdidos</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-300"></span>
+                            <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">DF: Dif. Juegos</span>
+                        </div>
+                    </div>
+
+                    {# TABLA DE CLASIFICACIÓN #}
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                        <table class="w-full border-collapse">
+                            <thead class="bg-gray-50/50 text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <tr>
+                                <th class="pl-4 pr-2 md:px-8 py-5 text-left">Pareja</th>
+                                <th class="px-2 py-5 text-center">Pts</th>
+                                {# Escritorio #}
+                                <th class="hidden md:table-cell px-2 py-5 text-center">PJ</th>
+                                <th class="hidden md:table-cell px-2 py-5 text-center text-emerald-500">PG</th>
+                                <th class="hidden md:table-cell px-2 py-5 text-center text-amber-500">PE</th>
+                                <th class="hidden md:table-cell px-2 py-5 text-center text-red-400">PP</th>
+                                {# Móvil #}
+                                <th class="md:hidden px-2 py-5 text-center italic">G/E/P</th>
+                                <th class="px-2 py-5 text-center">Juegos</th>
+                                <th class="pr-4 pl-2 md:px-6 py-5 bg-gray-50/80 text-gray-900 text-center">DF</th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                            {% for team, data in stats %}
+                                <tr class="{{ loop.index <= 3 ? 'bg-indigo-50/10' : '' }} hover:bg-gray-50/30 transition-colors">
+                                    {# Celda Pareja #}
+                                    <td class="pl-4 pr-2 md:px-8 py-4">
+                                        <div class="flex items-center">
+                                        <span class="text-xs font-black {{ loop.index <= 3 ? 'text-amber-500' : 'text-gray-300' }} mr-2 md:mr-4 w-4">
+                                            {{ loop.index }}º
+                                        </span>
+                                            <div class="leading-tight min-w-0">
+                                                {% set players = team|split('/') %}
+                                                <p class="text-[10px] md:text-xs font-black text-gray-900 uppercase tracking-tight truncate">{{ players[0]|trim }}</p>
+                                                <p class="text-[10px] md:text-xs font-black text-gray-900 uppercase tracking-tight truncate">{{ players[1]|default('')|trim }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    {# Puntos #}
+                                    <td class="px-1 md:px-4 py-4 text-center">
+                                    <span class="inline-flex items-center justify-center bg-indigo-600 text-white w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl text-[11px] md:text-sm font-black shadow-lg shadow-indigo-100">
+                                        {{ data.points }}
+                                    </span>
+                                    </td>
+
+                                    {# Récord Desktop #}
+                                    <td class="hidden md:table-cell px-2 py-4 text-center text-xs font-bold text-gray-500">{{ data.pj }}</td>
+                                    <td class="hidden md:table-cell px-2 py-4 text-center text-xs font-bold text-emerald-500">{{ data.pg }}</td>
+                                    <td class="hidden md:table-cell px-2 py-4 text-center text-xs font-bold text-amber-500">{{ data.pe }}</td>
+                                    <td class="hidden md:table-cell px-2 py-4 text-center text-xs font-bold text-red-400">{{ data.pp }}</td>
+
+                                    {# Récord Móvil #}
+                                    <td class="md:hidden px-1 py-4 text-center">
+                                        <div class="text-[10px] font-black text-gray-900">{{ data.pj }}<span class="text-[8px] text-gray-400 ml-0.5">PJ</span></div>
+                                        <div class="flex justify-center gap-1 text-[9px] font-black">
+                                            <span class="text-emerald-500">{{ data.pg }}</span>
+                                            <span class="text-amber-500">{{ data.pe }}</span>
+                                            <span class="text-red-400">{{ data.pp }}</span>
+                                        </div>
+                                    </td>
+
+                                    {# Juegos #}
+                                    <td class="px-1 md:px-4 py-4 text-center">
+                                        <div class="text-[9px] md:text-xs font-black leading-none">
+                                            <span class="text-gray-700 block md:inline">{{ data.pf }}</span>
+                                            <span class="hidden md:inline text-gray-300">/</span>
+                                            <span class="text-gray-400 block md:inline text-[8px] md:text-xs">{{ data.pc }}</span>
+                                        </div>
+                                    </td>
+
+                                    {# Diferencia #}
+                                    <td class="pr-4 pl-2 md:px-6 py-4 text-center bg-gray-50/30 font-black text-xs md:text-base {{ data.df > 0 ? 'text-emerald-500' : (data.df < 0 ? 'text-red-500' : 'text-gray-400') }}">
+                                        {{ data.df > 0 ? '+' : '' }}{{ data.df }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            {% else %}
-                <div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-gray-100">
-                    <i class="fas fa-calendar-alt text-4xl text-gray-100 mb-4 block"></i>
-                    <p class="text-gray-400 font-medium italic">No hay partidos programados todavía.</p>
+            {% endif %}
+
+            {# SECCIÓN NORMATIVA #}
+            <div x-show="tab === 'rules'" class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100 animate-fade-in relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 opacity-5">
+                    <i class="fas fa-file-invoice text-9xl"></i>
                 </div>
-            {% endfor %}
-        </div>
-
-        {# SECCIÓN CLASIFICACIÓN #}
-        {% if tournament.hasRanking %}
-        <div x-show="tab === 'ranking'" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden animate-fade-in">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
-                        <tr>
-                            <th class="px-6 py-4 text-left">Pareja</th>
-                            <th class="px-2 py-4">Pts</th>
-                            <th class="px-2 py-4">PJ</th>
-                            <th class="px-2 py-4">PG</th>
-                            <th class="px-2 py-4">DF</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 text-sm">
-                        {% for team, data in stats %}
-                            <tr class="{{ loop.index <= 3 ? 'bg-indigo-50/20' : '' }}">
-                                <td class="px-6 py-4 font-bold text-gray-900">
-                                    <span class="text-gray-300 mr-2 italic">{{ loop.index }}º</span> {{ team }}
-                                </td>
-                                <td class="px-2 py-4 text-center font-black text-indigo-600">{{ data.points }}</td>
-                                <td class="px-2 py-4 text-center text-gray-500">{{ data.pj }}</td>
-                                <td class="px-2 py-4 text-center text-gray-500">{{ data.pg }}</td>
-                                <td class="px-2 py-4 text-center font-bold {{ data.df >= 0 ? 'text-green-600' : 'text-red-400' }}">
-                                    {{ data.df > 0 ? '+' : '' }}{{ data.df }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {% endif %}
-
-        {# SECCIÓN NORMATIVA #}
-        <div x-show="tab === 'rules'" class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 prose max-w-none animate-fade-in">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Normas del Torneo</h2>
-            <div class="text-gray-600 leading-relaxed whitespace-pre-wrap">
-                {{ tournament.description ?: 'No se ha especificado normativa para este torneo.' }}
+                <h2 class="text-xl font-black text-gray-900 uppercase tracking-widest mb-6 flex items-center">
+                    <i class="fas fa-shield-halved mr-3 text-indigo-500"></i> Normas
+                </h2>
+                <div class="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap font-medium">
+                    {{ tournament.description ?: 'No se ha especificado normativa para este torneo.' }}
+                </div>
             </div>
         </div>
     </div>
-</div>
-
-{# Incluimos Alpine.js para que las pestañas funcionen sin recargar #}
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 {% endblock %}

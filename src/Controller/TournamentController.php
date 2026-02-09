@@ -46,10 +46,13 @@ class TournamentController extends AbstractController
         $user = $this->getUser();
         if (!$user) return $this->redirectToRoute('app_login');
 
+        // Buscamos partidos donde el usuario sea player1 o player2 de team1 O de team2
         $allGames = $gameRepository->createQueryBuilder('g')
-            ->where('g.player1 = :user OR g.player2 = :user OR g.player3 = :user OR g.player4 = :user')
+            ->leftJoin('g.team1', 't1')
+            ->leftJoin('g.team2', 't2')
+            ->where('t1.player1 = :user OR t1.player2 = :user OR t2.player1 = :user OR t2.player2 = :user')
             ->setParameter('user', $user)
-            ->orderBy('g.date', 'ASC') // Próximos primero
+            ->orderBy('g.date', 'ASC')
             ->getQuery()
             ->getResult();
 
@@ -57,11 +60,10 @@ class TournamentController extends AbstractController
         $pastGames = [];
 
         foreach ($allGames as $game) {
-            // Si no tiene resultado, es próximo. Si tiene, es pasado.
             if (empty($game->getScore())) {
                 $upcomingGames[] = $game;
             } else {
-                // Para los pasados, los ponemos en la lista de arriba a abajo (más recientes primero)
+                // Más recientes primero para los finalizados
                 array_unshift($pastGames, $game);
             }
         }

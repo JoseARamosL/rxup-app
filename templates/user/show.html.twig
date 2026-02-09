@@ -1,42 +1,95 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User{% endblock %}
+{% block title %}Perfil: {{ user.name }} - RxUp{% endblock %}
 
 {% block body %}
-    <h1>User</h1>
+    <div class="max-w-3xl mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8">
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ user.id }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ user.email }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ user.name }}</td>
-            </tr>
-            <tr>
-                <th>Roles</th>
-                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
-            </tr>
-            <tr>
-                <th>Password</th>
-                <td>{{ user.password }}</td>
-            </tr>
-            <tr>
-                <th>Phone</th>
-                <td>{{ user.phone }}</td>
-            </tr>
-        </tbody>
-    </table>
+        {# Botón Volver #}
+        <div class="mb-8">
+            <a href="{{ path('app_user_index') }}" class="group inline-flex items-center text-xs font-black text-gray-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">
+                <i class="fas fa-arrow-left mr-2 transform group-hover:-translate-x-1 transition-transform"></i>
+                Volver al listado
+            </a>
+        </div>
 
-    <a href="{{ path('app_user_index') }}">back to list</a>
+        <div class="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[3rem] overflow-hidden border border-gray-100">
 
-    <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a>
+            {# Cabecera de Perfil con Avatar #}
+            <div class="bg-gray-900 px-8 py-12 text-center relative overflow-hidden">
+                {# Decoración de fondo #}
+                <div class="absolute top-0 right-0 p-8 opacity-10">
+                    <i class="fas fa-racquet text-white text-9xl -rotate-12"></i>
+                </div>
 
-    {{ include('user/_delete_form.html.twig') }}
+                <div class="relative z-10">
+                    <div class="inline-flex items-center justify-center h-24 w-24 rounded-[2rem] bg-indigo-600 text-white text-3xl font-black shadow-2xl mb-4 border-4 border-gray-800">
+                        {{ user.name|slice(0, 2)|upper }}
+                    </div>
+                    <h1 class="text-3xl font-black text-white uppercase tracking-tighter">{{ user.name }}</h1>
+                    <div class="mt-2">
+                        {% if 'ROLE_ADMIN' in user.roles %}
+                            <span class="px-3 py-1 text-[10px] font-black bg-red-500 text-white rounded-lg uppercase tracking-[0.2em]">Administrador</span>
+                        {% else %}
+                            <span class="px-3 py-1 text-[10px] font-black bg-indigo-500 text-white rounded-lg uppercase tracking-[0.2em]">Jugador Oficial</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# Información Detallada #}
+            <div class="p-8 md:p-12 space-y-8">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {# Columna Email #}
+                    <div class="flex items-start gap-4">
+                        <div class="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Correo Electrónico</p>
+                            <p class="text-sm font-bold text-gray-900">{{ user.email }}</p>
+                        </div>
+                    </div>
+
+                    {# Columna Teléfono #}
+                    <div class="flex items-start gap-4">
+                        <div class="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Teléfono</p>
+                            <p class="text-sm font-bold text-gray-900">{{ user.phone ?? 'No registrado' }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-8 border-t border-gray-50 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {# ID del Sistema #}
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">ID Único</p>
+                        <code class="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">#{{ user.id }}</code>
+                    </div>
+                    {# Nota sobre Password #}
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Estado de Seguridad</p>
+                        <span class="text-xs font-bold text-emerald-500 flex items-center">
+                        <i class="fas fa-shield-check mr-2"></i> Cuenta Activa
+                    </span>
+                    </div>
+                </div>
+
+                {# Botones de Acción #}
+                <div class="pt-10 flex flex-col md:flex-row gap-4">
+                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="flex-1 inline-flex items-center justify-center bg-gray-900 text-white text-xs font-black py-5 px-8 rounded-2xl hover:bg-gray-800 transition-all uppercase tracking-widest shadow-xl">
+                        <i class="fas fa-user-edit mr-2 text-indigo-400"></i> Editar Jugador
+                    </a>
+
+                    <div class="md:w-max">
+                        {{ include('user/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
