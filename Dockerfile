@@ -1,7 +1,6 @@
-# Usamos PHP 8.3 con Apache incluido (mucho más fácil para hosting)
 FROM php:8.3-apache
 
-# Instalar dependencias necesarias para Postgres y Symfony
+# 1. Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libicu-dev \
@@ -10,37 +9,37 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && docker-php-ext-install intl pdo pdo_pgsql zip
 
-# Habilitar el módulo de reescritura de Apache (vital para Symfony)
 RUN a2enmod rewrite
 
-# Copiar el código del proyecto
-COPY . /var/www/html
-
-# Configurar Apache para que apunte a /public en lugar de a la raíz
+# 2. Configurar el DocumentRoot de Apache
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Instalar Composer
+# 3. Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Instalar dependencias de producción
-RUN composer install --no-dev --optimize-autoloader --no-scripts --prefer-dist --no-interaction
+WORKDIR /var/www/html
 
-# 1. Copiamos SOLO los archivos de dependencias primero
+# 4. Copiar archivos de dependencias e instalar (para cachear capas)
 COPY composer.json composer.lock ./
-
-# 2. Instalamos SIN scripts (esto ahorra mucha RAM)
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
 
-# 3. AHORA copiamos el resto del código
-COPY . /var/www/html
+# 5. Copiar el resto del código
+COPY . .
 
-# 4. Finalizamos el autoloader y permisos
+# 6. Crear carpetas necesarias y asegurar que existen antes del chmod
+RUN mkdir -p var/cache var/log var/sessions
+
+# 7. Generar Autoloader y dar permisos (El orden importa)
 RUN composer dump-autoload --optimize --no-dev --classmap-authoritative
-RUN chown -R www-data:www-data /var/www/html && chmod -R 775 /var/www/html/var
+RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 775 /var/www/html/var
+
+# 8. Asegurar que el script de entrada sea ejecutable
+RUN chmod +x docker-entrypoint.sh
+RUN cp docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 80
 
-# Usamos el script como punto de entrada
 ENTRYPOINT ["docker-entrypoint.sh"]
