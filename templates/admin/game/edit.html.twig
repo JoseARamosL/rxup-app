@@ -3,75 +3,82 @@
 {% block title %}Resultado - {{ tournament.name }}{% endblock %}
 
 {% block body %}
-    <div class="min-h-screen md:min-h-[85vh] flex flex-col justify-center py-8 md:py-12 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen md:min-h-[85vh] flex flex-col justify-center py-8 md:py-12 px-4 sm:px-6 lg:px-8 relative">
 
-        {# Header con icono #}
-        <div class="sm:mx-auto sm:w-full sm:max-w-2xl">
-            <div class="flex justify-center mb-6">
-                <div class="h-16 w-16 bg-gray-900 rounded-[1.5rem] flex items-center justify-center shadow-2xl border-b-4 border-indigo-600">
-                    <i class="fas fa-pennant text-indigo-500 text-2xl"></i>
+        {# Header con identidad RXUP #}
+        <div class="sm:mx-auto sm:w-full sm:max-w-2xl relative z-10">
+            <div class="flex justify-center mb-8">
+                <div class="h-20 w-20 bg-[#e63946] rounded-[2rem] flex items-center justify-center shadow-[0_0_30px_rgba(230,57,70,0.3)] rotate-3 group hover:rotate-0 transition-transform duration-500">
+                    <i class="fas fa-bolt text-white text-3xl bolt-flicker"></i>
                 </div>
             </div>
-            <h2 class="text-center text-3xl font-black text-gray-900 tracking-tighter uppercase leading-none">
-                Finalizar Encuentro
+            <h2 class="text-center text-4xl md:text-5xl font-black text-[#e2d9c2] tracking-tighter uppercase italic leading-none">
+                Finalizar <span class="text-[#e63946]">Encuentro</span>
             </h2>
-            <p class="mt-3 text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">
-                {{ tournament.name }} • {{ game.phase }}
+            <p class="mt-4 text-center text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">
+                {{ tournament.name }} <span class="mx-2 text-gray-700">•</span> {{ game.phase }}
             </p>
         </div>
 
-        <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-2xl">
-            <div class="bg-white py-10 px-6 md:px-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 rounded-[3rem]">
+        <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-2xl relative z-10">
+            <div class="bg-[#1a1a1a] py-10 px-6 md:px-12 shadow-[0_40px_80px_rgba(0,0,0,0.6)] border border-white/5 rounded-[3rem]">
 
-                {{ form_start(form, {'attr': {'class': 'space-y-10'}}) }}
+                {{ form_start(form, {'attr': {'class': 'space-y-12'}}) }}
 
-                {# PANEL DE MARCADOR ESTILO PISTA #}
-                <div class="space-y-6">
-                    <div class="flex flex-col md:flex-row items-center justify-between gap-6 bg-gray-50 p-6 md:p-8 rounded-[2rem] border border-gray-100 relative">
+                {# PANEL DE MARCADOR DIGITAL #}
+                <div class="space-y-8">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-8 bg-[#252525] p-8 md:p-10 rounded-[2.5rem] border border-white/5 shadow-inner relative overflow-hidden">
+
+                        {# Luz ambiental de fondo #}
+                        <div class="absolute inset-0 bg-gradient-to-b from-[#e63946]/5 to-transparent pointer-events-none"></div>
 
                         {# Pareja Local #}
-                        <div class="text-center flex-1 order-1">
-                            <span class="block text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-3">Local</span>
-                            <div class="space-y-0.5">
-                                <p class="text-sm md:text-base font-black text-gray-900 uppercase tracking-tight leading-tight">{{ game.team1.player1.name }}</p>
-                                <p class="text-sm md:text-base font-black text-gray-900 uppercase tracking-tight leading-tight">{{ game.team1.player2.name }}</p>
+                        <div class="text-center flex-1 order-1 relative z-10">
+                            <span class="block text-[9px] font-black text-[#e63946] uppercase tracking-[0.3em] mb-4 opacity-80">Local</span>
+                            <div class="space-y-1">
+                                <p class="text-sm md:text-lg font-black text-[#e2d9c2] uppercase tracking-tight leading-tight">{{ game.team1.player1.name }}</p>
+                                <p class="text-sm md:text-lg font-black text-[#e2d9c2] uppercase tracking-tight leading-tight">{{ game.team1.player2.name }}</p>
                             </div>
                         </div>
 
-                        {# INPUT MARCADOR (CENTRAL) #}
-                        <div class="flex flex-col items-center order-2 md:mx-4 w-full md:w-auto">
+                        {# INPUT MARCADOR (LA CONSOLA) #}
+                        <div class="flex flex-col items-center order-2 md:mx-4 w-full md:w-auto relative z-10">
                             <div class="relative group w-full">
-                                <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+                                {# Brillo exterior del marcador #}
+                                <div class="absolute -inset-1 bg-[#e63946] rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+
                                 {{ form_widget(form.score, {
                                     'attr': {
-                                        'class': 'relative block w-full md:w-48 text-center text-4xl md:text-5xl font-mono font-black py-5 md:py-6 rounded-2xl border-0 bg-gray-900 text-indigo-400 focus:ring-4 focus:ring-indigo-500/20 transition-all uppercase placeholder-gray-700 tracking-widest',
+                                        'class': 'relative block w-full md:w-56 text-center text-4xl md:text-5xl font-mono font-black py-6 md:py-8 rounded-2xl border-0 bg-[#0f0f0f] text-[#e63946] focus:ring-4 focus:ring-[#e63946]/20 transition-all uppercase placeholder-gray-800 tracking-widest italic shadow-2xl',
                                         'placeholder': '0-0 0-0'
                                     }
                                 }) }}
                             </div>
-                            <span class="text-[8px] font-black text-gray-400 uppercase mt-4 tracking-[0.2em]">Formato: 6-2 6-4</span>
+                            <span class="text-[9px] font-black text-gray-600 uppercase mt-5 tracking-[0.2em] flex items-center">
+                                <i class="fas fa-keyboard mr-2 opacity-30"></i> Formato: 6-2 6-4
+                            </span>
                         </div>
 
                         {# Pareja Visitante #}
-                        <div class="text-center flex-1 order-3">
-                            <span class="block text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-3">Visitante</span>
-                            <div class="space-y-0.5">
-                                <p class="text-sm md:text-base font-black text-gray-900 uppercase tracking-tight leading-tight">{{ game.team2.player1.name }}</p>
-                                <p class="text-sm md:text-base font-black text-gray-900 uppercase tracking-tight leading-tight">{{ game.team2.player2.name }}</p>
+                        <div class="text-center flex-1 order-3 relative z-10">
+                            <span class="block text-[9px] font-black text-[#e63946] uppercase tracking-[0.3em] mb-4 opacity-80">Visitante</span>
+                            <div class="space-y-1">
+                                <p class="text-sm md:text-lg font-black text-[#e2d9c2] uppercase tracking-tight leading-tight">{{ game.team2.player1.name }}</p>
+                                <p class="text-sm md:text-lg font-black text-[#e2d9c2] uppercase tracking-tight leading-tight">{{ game.team2.player2.name }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {# Detalles Logísticos (Compactos) #}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50/50 p-6 rounded-2xl border border-dashed border-gray-200">
-                    <div class="space-y-2">
-                        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Pista / Ubicación</label>
-                        {{ form_widget(form.court, {'attr': {'class': 'w-full bg-white border-0 rounded-xl font-bold text-gray-700 p-3 ring-1 ring-gray-100 focus:ring-2 focus:ring-indigo-500 text-xs uppercase'}}) }}
+                {# Detalles Logísticos #}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-[#252525]/50 p-8 rounded-3xl border border-white/5 border-dashed">
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest ml-2">Pista / Arena</label>
+                        {{ form_widget(form.court, {'attr': {'class': 'w-full bg-[#1a1a1a] border-0 rounded-xl font-black text-[#e2d9c2] p-4 focus:ring-2 focus:ring-[#e63946] text-xs uppercase shadow-inner outline-none'}}) }}
                     </div>
-                    <div class="space-y-2">
-                        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Fecha Programada</label>
-                        {{ form_widget(form.date, {'attr': {'class': 'w-full bg-white border-0 rounded-xl font-bold text-gray-700 p-3 ring-1 ring-gray-100 focus:ring-2 focus:ring-indigo-500 text-xs uppercase'}}) }}
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest ml-2">Fecha y Hora</label>
+                        {{ form_widget(form.date, {'attr': {'class': 'w-full bg-[#1a1a1a] border-0 rounded-xl font-black text-[#e2d9c2] p-4 focus:ring-2 focus:ring-[#e63946] text-xs uppercase shadow-inner outline-none'}}) }}
                     </div>
                 </div>
 
@@ -82,19 +89,19 @@
                     {{ form_row(form.phase) }}
                 </div>
 
-                {# Botón de acción #}
-                <div class="pt-2">
-                    <button type="submit" class="group w-full flex items-center justify-center py-5 px-4 border border-transparent rounded-[1.5rem] shadow-xl shadow-indigo-100 text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 transition-all uppercase tracking-[0.2em]">
-                        <i class="fas fa-check-double mr-2 group-hover:scale-110 transition-transform"></i>
-                        Confirmar Resultado
+                {# Botón de acción RXUP #}
+                <div class="pt-4">
+                    <button type="submit" class="group w-full flex items-center justify-center py-6 px-4 rounded-[2rem] text-xs font-black text-white bg-[#e63946] hover:bg-[#ff4d5a] transition-all uppercase tracking-[0.4em] shadow-[0_20px_40px_rgba(230,57,70,0.3)] italic">
+                        <i class="fas fa-trophy mr-3 group-hover:scale-125 transition-transform group-hover:rotate-12"></i>
+                        Confirmar Victoria
                     </button>
                 </div>
 
                 {{ form_end(form) }}
 
-                <div class="mt-8">
-                    <a href="{{ path('app_admin_game_index', {id: tournament.id}) }}" class="flex justify-center text-[10px] font-black text-gray-300 hover:text-indigo-600 uppercase tracking-[0.2em] transition-colors">
-                        <i class="fas fa-arrow-left mr-2"></i> Volver al calendario
+                <div class="mt-10">
+                    <a href="{{ path('app_admin_game_index', {id: tournament.id}) }}" class="flex justify-center text-[10px] font-black text-gray-600 hover:text-[#e2d9c2] uppercase tracking-[0.3em] transition-all group">
+                        <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-2 transition-transform"></i> Volver al Calendario
                     </a>
                 </div>
             </div>

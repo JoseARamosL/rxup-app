@@ -5,65 +5,68 @@
 {% block body %}
     <div class="max-w-4xl mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8">
 
-        {# Header #}
-        <div class="mb-10 text-center md:text-left">
-            <span class="text-indigo-600 font-black text-[10px] uppercase tracking-[0.3em] mb-1 block">Agenda Personal</span>
-            <h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase leading-none">Mis Partidos</h1>
-            <p class="text-gray-500 text-xs font-medium mt-2 uppercase tracking-wide">Gestiona tus próximos encuentros y revisa tus resultados.</p>
+        {# Header Estilo Urbano #}
+        <div class="mb-10 text-center md:text-left relative">
+            <div class="absolute -left-4 top-0 w-1 h-12 bg-[#e63946] rounded-full hidden md:block"></div>
+            <span class="text-[#e63946] font-black text-[10px] uppercase tracking-[0.4em] mb-1 block">Agenda Personal</span>
+            <h1 class="text-4xl md:text-5xl font-black text-[#e2d9c2] tracking-tighter uppercase italic leading-none">Mis Partidos</h1>
+            <p class="text-gray-500 text-[10px] font-bold mt-2 uppercase tracking-widest">Domina tus tiempos. Revisa tus próximos retos y tu historial.</p>
         </div>
 
         <div x-data="{ view: 'upcoming' }" class="space-y-8">
-            {# Selector de Vista #}
-            <div class="flex p-1.5 bg-gray-100 rounded-[2rem] w-full md:w-max">
-                <button @click="view = 'upcoming'" :class="view === 'upcoming' ? 'bg-white shadow-lg text-indigo-600 scale-105' : 'text-gray-500'" class="flex-1 md:flex-none px-8 py-3 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all duration-300">
+            {# Selector de Vista (Responsive Fix) #}
+            <div class="flex p-1.5 bg-[#1a1a1a] rounded-[2rem] w-full md:w-max border border-white/5 shadow-2xl">
+                <button @click="view = 'upcoming'"
+                        :class="view === 'upcoming' ? 'bg-[#e63946] text-white shadow-xl scale-105' : 'text-gray-500'"
+                        class="flex-1 md:flex-none px-6 md:px-10 py-3.5 rounded-[1.5rem] text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all duration-300">
                     Próximos ({{ upcomingGames|length }})
                 </button>
-                <button @click="view = 'past'" :class="view === 'past' ? 'bg-white shadow-lg text-indigo-600 scale-105' : 'text-gray-500'" class="flex-1 md:flex-none px-8 py-3 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all duration-300">
+                <button @click="view = 'past'"
+                        :class="view === 'past' ? 'bg-[#e63946] text-white shadow-xl scale-105' : 'text-gray-500'"
+                        class="flex-1 md:flex-none px-6 md:px-10 py-3.5 rounded-[1.5rem] text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all duration-300">
                     Finalizados ({{ pastGames|length }})
                 </button>
             </div>
 
             {# LISTA DE PARTIDOS PRÓXIMOS #}
-            <div x-show="view === 'upcoming'" class="space-y-4 animate-fade-in">
+            <div x-show="view === 'upcoming'" class="space-y-6 animate-fade-in">
                 {% for game in upcomingGames %}
-                    <div class="bg-white rounded-[2.5rem] border border-gray-100 p-6 md:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] group hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-500 border-l-8 border-l-indigo-500">
+                    <div class="bg-[#1a1a1a] rounded-[2.5rem] border border-white/5 p-6 md:p-10 shadow-2xl group hover:border-[#e63946]/30 transition-all duration-500 border-l-[12px] border-l-[#e63946]">
                         <div class="flex flex-col md:flex-row items-center justify-between gap-8">
 
                             {# Info Torneo y Fecha #}
-                            <div class="text-center md:text-left min-w-[120px]">
-                                <p class="text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-1">{{ game.tournament.name }}</p>
-                                <p class="text-xl font-black text-gray-900 leading-none">{{ game.date ? game.date|date('H:i') : '--:--' }}</p>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase mt-1">{{ game.date ? game.date|date('d M Y') : 'PDTE' }}</p>
+                            <div class="text-center md:text-left min-w-[140px]">
+                                <p class="text-[9px] font-black text-[#e63946] uppercase tracking-widest mb-1 italic">{{ game.tournament.name }}</p>
+                                <p class="text-3xl font-black text-[#e2d9c2] leading-none italic tracking-tighter">{{ game.date ? game.date|date('H:i') : '--:--' }}</p>
+                                <p class="text-[10px] font-bold text-gray-500 uppercase mt-2 tracking-widest">{{ game.date ? game.date|date('d M Y') : 'FECHA PDTE' }}</p>
                             </div>
 
                             {# Bloque Central: El Encuentro #}
-                            <div class="flex items-center justify-center space-x-6 md:space-x-12 flex-1">
-                                {# Tu Pareja o Team 1 #}
+                            <div class="flex items-center justify-center space-x-6 md:space-x-14 flex-1">
                                 <div class="text-center">
-                                    <p class="text-[11px] md:text-sm font-black text-gray-900 uppercase tracking-tight">{{ game.team1.player1.name }}</p>
-                                    <p class="text-[11px] md:text-sm font-black text-gray-900 uppercase tracking-tight">{{ game.team1.player2.name }}</p>
+                                    <p class="text-xs md:text-sm font-black text-[#e2d9c2] uppercase tracking-tight">{{ game.team1.player1.name }}</p>
+                                    <p class="text-xs md:text-sm font-black text-[#e2d9c2] uppercase tracking-tight opacity-50">{{ game.team1.player2.name }}</p>
                                 </div>
 
-                                <div class="text-indigo-100 font-black text-2xl italic">VS</div>
+                                <div class="text-white/10 font-black text-3xl italic tracking-tighter">VS</div>
 
-                                {# Rivales o Team 2 #}
                                 <div class="text-center">
-                                    <p class="text-[11px] md:text-sm font-black text-gray-900 uppercase tracking-tight">{{ game.team2.player1.name }}</p>
-                                    <p class="text-[11px] md:text-sm font-black text-gray-900 uppercase tracking-tight">{{ game.team2.player2.name }}</p>
+                                    <p class="text-xs md:text-sm font-black text-[#e2d9c2] uppercase tracking-tight">{{ game.team2.player1.name }}</p>
+                                    <p class="text-xs md:text-sm font-black text-[#e2d9c2] uppercase tracking-tight opacity-50">{{ game.team2.player2.name }}</p>
                                 </div>
                             </div>
 
                             {# Pista #}
-                            <div class="bg-gray-50 px-5 py-3 rounded-2xl border border-gray-100 text-center min-w-[100px]">
-                                <span class="block text-[8px] font-black text-gray-400 uppercase tracking-widest">Pista</span>
-                                <span class="text-xs font-black text-gray-700 uppercase">{{ game.court|default('TBD') }}</span>
+                            <div class="bg-[#252525] px-6 py-4 rounded-3xl border border-white/5 text-center min-w-[110px] shadow-inner">
+                                <span class="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Pista</span>
+                                <span class="text-xs font-black text-[#e2d9c2] uppercase italic">{{ game.court|default('TBD') }}</span>
                             </div>
                         </div>
                     </div>
                 {% else %}
-                    <div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-gray-100">
-                        <i class="fas fa-calendar-day text-4xl text-gray-100 mb-4 block"></i>
-                        <p class="text-gray-400 font-black uppercase text-xs tracking-widest">No tienes partidos programados</p>
+                    <div class="text-center py-24 bg-[#1a1a1a] rounded-[3rem] border-2 border-dashed border-white/5">
+                        <i class="fas fa-bolt text-gray-800 text-5xl mb-6 block"></i>
+                        <p class="text-gray-500 font-black uppercase text-[10px] tracking-[0.3em]">Sin batallas programadas</p>
                     </div>
                 {% endfor %}
             </div>
@@ -71,32 +74,32 @@
             {# LISTA DE PARTIDOS FINALIZADOS #}
             <div x-show="view === 'past'" class="space-y-4 animate-fade-in" x-cloak>
                 {% for game in pastGames %}
-                    <div class="bg-white rounded-[2.5rem] border border-gray-100 p-6 md:p-8 opacity-80 hover:opacity-100 transition-opacity">
+                    <div class="bg-[#1a1a1a] rounded-[2.5rem] border border-white/5 p-6 md:p-8 opacity-60 hover:opacity-100 transition-all duration-300">
                         <div class="flex flex-col md:flex-row items-center justify-between gap-8">
-                            <div class="text-center md:text-left min-w-[100px]">
-                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{{ game.tournament.name }}</p>
-                                <p class="text-xs font-black text-gray-400 uppercase">{{ game.date|date('d/m/Y') }}</p>
+                            <div class="text-center md:text-left min-w-[120px]">
+                                <p class="text-[9px] font-black text-gray-600 uppercase tracking-widest mb-1">{{ game.tournament.name }}</p>
+                                <p class="text-xs font-black text-gray-500 uppercase tracking-tighter italic">{{ game.date|date('d/m/Y') }}</p>
                             </div>
 
                             <div class="flex items-center justify-center space-x-6 md:space-x-12 flex-1">
-                                <div class="text-center opacity-60">
-                                    <p class="text-xs font-black text-gray-900 uppercase tracking-tight">{{ game.team1.player1.name }}</p>
-                                    <p class="text-xs font-black text-gray-900 uppercase tracking-tight">{{ game.team1.player2.name }}</p>
+                                <div class="text-center">
+                                    <p class="text-xs font-bold text-[#e2d9c2] uppercase opacity-40">{{ game.team1.player1.name }}</p>
+                                    <p class="text-xs font-bold text-[#e2d9c2] uppercase opacity-40">{{ game.team1.player2.name }}</p>
                                 </div>
 
-                                <div class="bg-gray-900 text-white px-5 py-2 rounded-xl font-mono text-xl shadow-lg border-b-2 border-indigo-500">
+                                <div class="bg-[#e63946] text-white px-6 py-2 rounded-2xl font-mono text-2xl italic font-black shadow-lg shadow-[#e63946]/20">
                                     {{ game.score }}
                                 </div>
 
-                                <div class="text-center opacity-60">
-                                    <p class="text-xs font-black text-gray-900 uppercase tracking-tight">{{ game.team2.player1.name }}</p>
-                                    <p class="text-xs font-black text-gray-900 uppercase tracking-tight">{{ game.team2.player2.name }}</p>
+                                <div class="text-center">
+                                    <p class="text-xs font-bold text-[#e2d9c2] uppercase opacity-40">{{ game.team2.player1.name }}</p>
+                                    <p class="text-xs font-bold text-[#e2d9c2] uppercase opacity-40">{{ game.team2.player2.name }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 {% else %}
-                    <p class="text-center py-20 text-gray-400 italic">Todavía no has finalizado ningún partido.</p>
+                    <p class="text-center py-24 text-gray-600 font-black uppercase text-[10px] tracking-widest italic opacity-50">Historial vacío.</p>
                 {% endfor %}
             </div>
         </div>

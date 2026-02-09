@@ -64,21 +64,25 @@ final class UserController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
-    {
+    public function edit(
+        Request $request,
+        User $user,
+        EntityManagerInterface $entityManager,
+        UserPasswordHasherInterface $passwordHasher // <--- Inyectar
+    ): Response {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Si por alguna razón la contraseña se quedó vacía o corrupta, la reseteamos
+            if (!$user->getPassword()) {
+                $user->setPassword($passwordHasher->hashPassword($user, 'nopassword'));
+            }
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_user_index');
         }
 
-        return $this->render('user/edit.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);
+        return $this->render('user/edit.html.twig', ['user' => $user, 'form' => $form]);
     }
 
     #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]

@@ -3,140 +3,157 @@
 {% block title %}Acceso - RXUP{% endblock %}
 
 {% block body %}
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
-        {# Encabezado / Logo #}
-        <div class="text-center">
-            <div class="mx-auto h-16 w-16 bg-indigo-600 rounded-2xl rotate-3 flex items-center justify-center shadow-lg mb-4">
-                <svg class="h-10 w-10 text-white -rotate-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-            </div>
-            <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">
-                RXUP
-            </h2>
-            <p class="mt-2 text-sm text-gray-500">
-                Tu plataforma de torneos y ligas
-            </p>
+    <div class="min-h-screen flex items-center justify-center bg-[#0f0f0f] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        {# Elementos decorativos de fondo #}
+        <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+            <div class="absolute top-[-10%] right-[-5%] w-96 h-96 bg-[#e63946] rounded-full blur-[120px]"></div>
+            <div class="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-[#e2d9c2] opacity-20 rounded-full blur-[120px]"></div>
         </div>
 
-        <form class="mt-8 space-y-6" method="post" id="login-form">
-            {% if error %}
-                <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4 rounded-md">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                            </svg>
+        <div class="max-w-md w-full space-y-8 bg-[#1a1a1a] p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/5 relative z-10">
+            {# Logo RXUP #}
+            <div class="text-center">
+                <div class="mx-auto h-20 w-20 mb-6 relative">
+                    <div class="absolute inset-0 border-2 border-[#e63946] rounded-full animate-pulse"></div>
+                    <div class="flex items-center justify-center h-full">
+                        <i class="fas fa-bolt text-[#e63946] text-3xl"></i>
+                    </div>
+                </div>
+
+                <h2 class="text-4xl font-black text-[#e2d9c2] tracking-tighter uppercase italic">
+                    RX<span class="text-[#e63946]">UP</span>
+                </h2>
+                <p class="mt-2 text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">
+                    Tu límite no tiene marca
+                </p>
+            </div>
+
+            <form class="mt-10 space-y-6" method="post" id="login-form">
+                {% if error %}
+                    <div class="bg-red-950/30 border-l-4 border-[#e63946] p-4 mb-4 rounded-xl">
+                        <p class="text-[10px] font-bold text-red-400 uppercase tracking-tight">
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </p>
+                    </div>
+                {% endif %}
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <div class="space-y-5">
+                    {# Email o Teléfono #}
+                    <div class="group">
+                        <label for="inputIdentifier" class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Email o Teléfono</label>
+                        <div class="relative">
+                        <span class="absolute inset-y-0 left-4 flex items-center text-gray-500 group-focus-within:text-[#e63946] transition-colors">
+                            <i class="fas fa-user-ninja"></i>
+                        </span>
+                            <input type="text" value="{{ last_username }}" name="_username" id="inputIdentifier"
+                                   class="block w-full pl-12 pr-4 py-4 bg-[#252525] border-0 rounded-2xl text-[#e2d9c2] focus:ring-2 focus:ring-[#e63946] transition-all outline-none placeholder-gray-600 font-bold text-sm"
+                                   placeholder="600123456" required autofocus>
                         </div>
-                        <div class="ml-3">
-                            <p class="text-sm text-red-700">
-                                {{ error.messageKey|trans(error.messageData, 'security') }}
-                            </p>
+                    </div>
+
+                    {# Contraseña Admin (Oculta por defecto) #}
+                    <div id="password-container" class="hidden transform transition-all duration-500 origin-top scale-95 opacity-0 group">
+                        <label for="inputPassword" class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Contraseña Admin</label>
+                        <div class="relative">
+                        <span class="absolute inset-y-0 left-4 flex items-center text-gray-500 group-focus-within:text-[#e63946] transition-colors">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                            <input type="password" name="_password" id="inputPassword"
+                                   class="block w-full pl-12 pr-4 py-4 bg-[#252525] border-0 rounded-2xl text-[#e2d9c2] focus:ring-2 focus:ring-[#e63946] transition-all outline-none font-bold text-sm"
+                                   placeholder="••••••••">
                         </div>
                     </div>
                 </div>
-            {% endif %}
 
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-            <div class="space-y-4">
-                {# Campo Identificador #}
-                <div>
-                    <label for="inputIdentifier" class="block text-sm font-semibold text-gray-700 mb-1">Email o Teléfono</label>
-                    <input type="text" value="{{ last_username }}" name="_username" id="inputIdentifier"
-                           class="block w-full px-4 py-3 rounded-xl border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 outline-none placeholder-gray-400"
-                           placeholder="ej: 600123456 o pepe@padel.com" required autofocus>
+                <div class="flex items-center justify-between px-1">
+                    <div class="flex items-center">
+                        <input id="remember_me" name="_remember_me" type="checkbox" class="h-4 w-4 text-[#e63946] focus:ring-[#e63946] border-white/10 bg-[#252525] rounded cursor-pointer">
+                        <label for="remember_me" class="ml-2 block text-[10px] font-black text-gray-400 uppercase tracking-widest cursor-pointer">Recordarme</label>
+                    </div>
                 </div>
 
-                {# Contenedor de Contraseña (Oculto por defecto) #}
-                <div id="password-container" class="hidden transform transition-all duration-300 origin-top scale-95 opacity-0">
-                    <label for="inputPassword" class="block text-sm font-semibold text-gray-700 mb-1">Contraseña de Administrador</label>
-                    <input type="password" name="_password" id="inputPassword"
-                           class="block w-full px-4 py-3 rounded-xl border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 outline-none"
-                           placeholder="Ingresa tu clave">
-                </div>
-            </div>
-
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <input id="remember_me" name="_remember_me" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer">
-                    <label for="remember_me" class="ml-2 block text-sm text-gray-700 cursor-pointer">
-                        Recordarme
-                    </label>
-                </div>
-            </div>
-
-            <div>
-                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 shadow-md">
-                    ENTRAR
+                <button type="submit" class="w-full flex justify-center items-center py-5 px-4 rounded-2xl text-xs font-black text-white bg-[#e63946] hover:bg-[#ff4d5a] transition-all uppercase tracking-[0.3em] shadow-[0_10px_30px_rgba(230,57,70,0.3)] group">
+                    <span>Entrar</span>
+                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                 </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 {% endblock %}
 
 {% block javascripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const identifierInput = document.getElementById('inputIdentifier');
-        const passwordContainer = document.getElementById('password-container');
-        const passwordInput = document.getElementById('inputPassword');
-        const form = document.getElementById('login-form');
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const identifierInput = document.getElementById('inputIdentifier');
+            const passwordContainer = document.getElementById('password-container');
+            const passwordInput = document.getElementById('inputPassword');
+            const form = document.getElementById('login-form');
 
-        let isChecking = false;
+            // Función para verificar el estado del usuario (Admin o Jugador)
+            const checkUserType = async (identifier) => {
+                if (identifier.length < 3) return { isAdmin: false };
+                try {
+                    const response = await fetch(`/check-user/${encodeURIComponent(identifier)}`);
+                    return await response.json();
+                } catch (e) {
+                    console.error("Error en la comprobación");
+                    return { isAdmin: false };
+                }
+            };
 
-        const checkAdminStatus = async () => {
-            const identifier = identifierInput.value.trim();
-            if (identifier.length < 3) return false;
-
-            isChecking = true;
-            try {
-                const response = await fetch(`/check-user/${encodeURIComponent(identifier)}`);
-                const data = await response.json();
-
-                if (data.isAdmin) {
-                    passwordContainer.classList.remove('hidden', 'scale-95', 'opacity-0');
-                    passwordContainer.classList.add('scale-100', 'opacity-100');
+            // Actualiza la interfaz visualmente
+            const updateUI = (isAdmin) => {
+                if (isAdmin) {
+                    passwordContainer.classList.remove('hidden');
+                    // Un pequeño delay para que la transición de Tailwind se vea
+                    setTimeout(() => {
+                        passwordContainer.classList.remove('scale-95', 'opacity-0');
+                        passwordContainer.classList.add('scale-100', 'opacity-100');
+                    }, 10);
                     passwordInput.setAttribute('required', 'required');
                     if (passwordInput.value === 'nopassword') passwordInput.value = '';
-                    return true; // Es admin
                 } else {
                     passwordContainer.classList.add('hidden', 'scale-95', 'opacity-0');
                     passwordInput.removeAttribute('required');
                     passwordInput.value = 'nopassword';
-                    return false; // Es usuario normal
                 }
-            } finally {
-                isChecking = false;
-            }
-        };
+            };
 
-        // Comprobar al salir del campo
-        identifierInput.addEventListener('blur', checkAdminStatus);
+            // Comprobar cuando el usuario deja de escribir en el campo
+            identifierInput.addEventListener('blur', async () => {
+                const data = await checkUserType(identifierInput.value.trim());
+                updateUI(data.isAdmin);
+            });
 
-        // CONTROL TOTAL DEL ENVÍO
-        form.addEventListener('submit', async (e) => {
-            // Si estamos en medio de una comprobación, esperamos
-            if (isChecking) {
+            // CONTROL TOTAL DEL ENVÍO
+            form.addEventListener('submit', async (e) => {
+                // 1. Detenemos el envío automático del navegador
                 e.preventDefault();
-                return;
-            }
 
-            const identifier = identifierInput.value.trim();
-            const response = await fetch(`/check-user/${encodeURIComponent(identifier)}`);
-            const data = await response.json();
+                const identifier = identifierInput.value.trim();
+                if (!identifier) return;
 
-            // Si es admin y no hay contraseña, frenamos y pedimos la clave
-            if (data.isAdmin && passwordInput.value === '') {
-                e.preventDefault();
-                passwordContainer.classList.remove('hidden', 'opacity-0');
-                passwordInput.focus();
-                alert('Eres administrador, por favor introduce tu contraseña.');
-            }
-            // Si es usuario normal, el formulario seguirá su curso con 'nopassword'
+                // 2. Comprobamos el estado real en el servidor antes de seguir
+                const data = await checkUserType(identifier);
+                updateUI(data.isAdmin);
+
+                // 3. Lógica de decisión
+                if (data.isAdmin) {
+                    // Si es admin y no ha puesto contraseña o tiene la de jugador, frenamos y pedimos clave
+                    if (passwordInput.value === '' || passwordInput.value === 'nopassword') {
+                        passwordInput.focus();
+                        return; // No se envía el formulario
+                    }
+                } else {
+                    // Si es jugador, nos aseguramos de que lleve 'nopassword'
+                    passwordInput.value = 'nopassword';
+                }
+
+                // 4. Si todo está correcto, enviamos el formulario manualmente
+                form.submit();
+            });
         });
-    });
-</script>
+    </script>
 {% endblock %}

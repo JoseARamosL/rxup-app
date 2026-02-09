@@ -1,77 +1,85 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Editar Torneo: {{ tournament.name }}{% endblock %}
+{% block title %}Config - {{ tournament.name }} - RXUP{% endblock %}
 
 {% block body %}
     <div class="max-w-3xl mx-auto py-8 px-4 sm:py-12">
 
-        {# Botón Volver Minimalista #}
-        <div class="mb-8">
-            <a href="{{ path('app_admin_tournament_index') }}" class="group inline-flex items-center text-xs font-black text-gray-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">
-                <i class="fas fa-arrow-left mr-2 transform group-hover:-translate-x-1 transition-transform"></i>
-                Volver al listado
+        {# Botón Volver Estilo RXUP #}
+        <div class="mb-10">
+            <a href="{{ path('app_admin_tournament_index') }}" class="group inline-flex items-center text-[10px] font-black text-gray-500 hover:text-[#e63946] transition-colors uppercase tracking-[0.3em]">
+                <i class="fas fa-chevron-left mr-2 transform group-hover:-translate-x-2 transition-transform"></i>
+                Panel de Control
             </a>
         </div>
 
-        <div class="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[2.5rem] overflow-hidden border border-gray-100">
+        <div class="bg-[#1a1a1a] shadow-[0_30px_60px_rgba(0,0,0,0.5)] rounded-[3rem] overflow-hidden border border-white/5 relative">
 
-            {# Cabecera Oscura Estilo App #}
-            <div class="bg-gray-900 px-8 py-10 text-center sm:text-left">
-                <span class="text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mb-2 block">Configuración</span>
-                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tighter">Editar Torneo</h1>
-                <p class="text-gray-500 text-xs font-medium mt-1 uppercase tracking-wider">{{ tournament.name }}</p>
+            {# Cabecera de Configuración #}
+            <div class="bg-[#e63946] px-8 py-12 text-center sm:text-left relative overflow-hidden">
+                {# Rayo decorativo de fondo #}
+                <i class="fas fa-bolt absolute right-[-10%] top-[-10%] text-white/10 text-9xl -rotate-12"></i>
+
+                <span class="text-white/60 text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Settings Arena</span>
+                <h1 class="text-3xl sm:text-4xl font-black text-white uppercase tracking-tighter italic italic">Editar Torneo</h1>
+                <p class="text-white/80 text-[11px] font-bold mt-2 uppercase tracking-widest">{{ tournament.name }}</p>
             </div>
 
-            {# Formulario Adaptable #}
-            {{ form_start(form, {'attr': {'class': 'p-6 sm:p-10 space-y-8'}}) }}
+            {# Formulario con Estética Dark #}
+            {{ form_start(form, {'attr': {'class': 'p-8 sm:p-12 space-y-10'}}) }}
 
             {# Nombre del Torneo #}
-            <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nombre Oficial</label>
+            <div class="space-y-3">
+                <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] ml-2">Nombre de la Competición</label>
                 {{ form_widget(form.name, {
-                    'attr': {'class': 'block w-full bg-gray-50 border-0 rounded-2xl text-gray-900 ring-1 ring-inset ring-gray-100 focus:ring-2 focus:ring-indigo-600 p-4 text-sm font-bold shadow-sm transition-all'}
+                    'attr': {'class': 'block w-full bg-[#252525] border-0 rounded-2xl text-[#e2d9c2] focus:ring-2 focus:ring-[#e63946] p-5 text-sm font-bold shadow-inner transition-all outline-none placeholder-gray-700'}
                 }) }}
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                 {# Tipo de Torneo #}
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Tipo de Formato</label>
-                    {{ form_widget(form.type, {
-                        'attr': {'class': 'block w-full bg-gray-50 border-0 rounded-2xl text-gray-900 ring-1 ring-inset ring-gray-100 focus:ring-2 focus:ring-indigo-600 p-4 text-sm font-bold shadow-sm transition-all'}
-                    }) }}
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] ml-2">Formato de Juego</label>
+                    <div class="relative">
+                        {{ form_widget(form.type, {
+                            'attr': {'class': 'block w-full bg-[#252525] border-0 rounded-2xl text-[#e2d9c2] focus:ring-2 focus:ring-[#e63946] p-5 text-sm font-black shadow-inner appearance-none outline-none'}
+                        }) }}
+                        <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-[#e63946]">
+                            <i class="fas fa-caret-down"></i>
+                        </div>
+                    </div>
                 </div>
 
-                {# INTERRUPTOR PARA CLASIFICACIÓN (Toggle moderno) #}
-                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                {# Toggle de Ranking RXUP #}
+                <div class="flex items-center justify-between p-6 bg-[#252525] rounded-3xl border border-white/5 shadow-inner">
                     <div class="flex flex-col">
-                        <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Ranking</span>
-                        <span class="text-[11px] font-bold text-gray-500 uppercase">Clasificación automática</span>
+                        <span class="text-[10px] font-black text-[#e63946] uppercase tracking-[0.2em] mb-1">Ranking</span>
+                        <span class="text-[9px] font-bold text-gray-500 uppercase">Clasificación Live</span>
                     </div>
 
                     <label class="relative inline-flex items-center cursor-pointer">
                         {{ form_widget(form.hasRanking, { 'attr': {'class': 'sr-only peer'} }) }}
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        <div class="w-14 h-7 bg-[#0f0f0f] rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-gray-600 after:rounded-full after:h-5 after:w-6 after:transition-all peer-checked:bg-[#e63946] peer-checked:after:bg-white shadow-inner"></div>
                     </label>
                 </div>
             </div>
 
             {# Descripción / Normativa #}
-            <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Descripción y Normativa</label>
+            <div class="space-y-3">
+                <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] ml-2">Normativa y Reglas</label>
                 {{ form_widget(form.description, {
                     'attr': {
-                        'class': 'block w-full bg-gray-50 border-0 rounded-3xl text-gray-900 ring-1 ring-inset ring-gray-100 focus:ring-2 focus:ring-indigo-600 p-6 text-sm leading-relaxed shadow-sm transition-all',
+                        'class': 'block w-full bg-[#252525] border-0 rounded-[2rem] text-[#e2d9c2] focus:ring-2 focus:ring-[#e63946] p-8 text-sm leading-relaxed shadow-inner transition-all outline-none placeholder-gray-700 font-medium',
                         'rows': '6',
-                        'placeholder': 'Escribe aquí las reglas, premios o información relevante...'
+                        'placeholder': 'Define aquí el espíritu de la competición...'
                     }
                 }) }}
             </div>
 
             {# Botón Guardar #}
-            <div class="pt-6">
-                <button type="submit" class="w-full flex justify-center py-5 px-4 border border-transparent rounded-[1.5rem] shadow-xl shadow-indigo-100 text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 transition-all uppercase tracking-[0.2em]">
-                    <i class="fas fa-save mr-2"></i> Actualizar Configuración
+            <div class="pt-8">
+                <button type="submit" class="group w-full flex justify-center items-center py-6 px-4 rounded-[2rem] text-xs font-black text-white bg-[#e63946] hover:bg-[#ff4d5a] transition-all uppercase tracking-[0.4em] shadow-[0_15px_40px_rgba(230,57,70,0.3)] italic">
+                    <i class="fas fa-save mr-3 group-hover:scale-125 transition-transform"></i> Actualizar Arena
                 </button>
             </div>
 

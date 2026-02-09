@@ -7,6 +7,7 @@ use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
@@ -26,28 +27,29 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
     public const LOGIN_ROUTE = 'app_login';
 
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator,
-        private UserRepository $userRepository
-        ) {}
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly UserRepository $userRepository,
+        private readonly UserPasswordHasherInterface $passwordHasher // <--- Inyectar
+    ) {}
 
     public function authenticate(Request $request): Passport
     {
         $identifier = $request->getPayload()->getString('_username');
         $password = $request->getPayload()->getString('_password') ?: 'nopassword';
 
-        // Buscamos al usuario antes de crear el Passport para una validación extra
-        $user = $this->userRepository->findOneByEmailOrPhone($identifier);
-
-        // Si es Admin y está intentando entrar con la clave dummy, denegamos antes de procesar
-        if ($user && in_array('ROLE_ADMIN', $user->getRoles()) && $password === 'nopassword') {
-            throw new UserNotFoundException('Los administradores requieren contraseña real.');
-        }
-
-        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $identifier);
-
         return new Passport(
-            new UserBadge($identifier, fn() => $user ?: throw new UserNotFoundException()),
-            new PasswordCredentials($password),
+            new UserBadge($identifier, fn() => $this->userRepository->findOneByEmailOrPhone($identifier) ?: throw new UserNotFoundException()),
+            new \Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials(
+                function($credentials, User $user) {
+                    if (in_array('ROLE_ADMIN', $user->getRoles())) {
+                        // Si es admin, comprobamos el hash de la contraseña que metió
+                        return $this->passwordHasher->isPasswordValid($user, $credentials);
+                    }
+                    // Si es jugador, ignoramos la contraseña y entra
+                    return true;
+                },
+                $password
+            ),
             [
                 new CsrfTokenBadge('authenticate', $request->getPayload()->getString('_csrf_token')),
                 new RememberMeBadge(),

@@ -1,91 +1,96 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Perfil: {{ user.name }} - RxUp{% endblock %}
+{% block title %}Perfil: {{ user.name }} - RXUP{% endblock %}
 
 {% block body %}
     <div class="max-w-3xl mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8">
 
-        {# Botón Volver #}
-        <div class="mb-8">
-            <a href="{{ path('app_user_index') }}" class="group inline-flex items-center text-xs font-black text-gray-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">
-                <i class="fas fa-arrow-left mr-2 transform group-hover:-translate-x-1 transition-transform"></i>
-                Volver al listado
+        {# Botón Volver Estilo RXUP #}
+        <div class="mb-10">
+            <a href="{{ path('app_user_index') }}" class="group inline-flex items-center text-[10px] font-black text-gray-500 hover:text-[#e63946] transition-colors uppercase tracking-[0.3em]">
+                <i class="fas fa-chevron-left mr-2 transform group-hover:-translate-x-2 transition-transform"></i>
+                Base de Jugadores
             </a>
         </div>
 
-        <div class="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[3rem] overflow-hidden border border-gray-100">
+        <div class="bg-[#1a1a1a] shadow-[0_40px_80px_rgba(0,0,0,0.6)] rounded-[3.5rem] overflow-hidden border border-white/5 relative">
 
-            {# Cabecera de Perfil con Avatar #}
-            <div class="bg-gray-900 px-8 py-12 text-center relative overflow-hidden">
-                {# Decoración de fondo #}
-                <div class="absolute top-0 right-0 p-8 opacity-10">
-                    <i class="fas fa-racquet text-white text-9xl -rotate-12"></i>
+            {# Cabecera de Perfil Industrial #}
+            <div class="bg-[#0f0f0f] px-8 py-14 text-center relative overflow-hidden border-b border-white/5">
+                {# Decoración de fondo (Rayo RXUP) #}
+                <div class="absolute -right-10 -top-10 opacity-[0.03] rotate-12">
+                    <i class="fas fa-bolt text-white text-[15rem]"></i>
                 </div>
 
                 <div class="relative z-10">
-                    <div class="inline-flex items-center justify-center h-24 w-24 rounded-[2rem] bg-indigo-600 text-white text-3xl font-black shadow-2xl mb-4 border-4 border-gray-800">
+                    {# Avatar Estilo Badge #}
+                    <div class="inline-flex items-center justify-center h-28 w-28 rounded-[2.5rem] bg-[#252525] text-[#e63946] text-4xl font-black shadow-[0_20px_40px_rgba(0,0,0,0.5)] mb-6 border-4 border-[#1a1a1a] italic">
                         {{ user.name|slice(0, 2)|upper }}
                     </div>
-                    <h1 class="text-3xl font-black text-white uppercase tracking-tighter">{{ user.name }}</h1>
-                    <div class="mt-2">
+
+                    <h1 class="text-4xl font-black text-[#e2d9c2] uppercase tracking-tighter italic leading-none">{{ user.name }}</h1>
+
+                    <div class="mt-4 flex justify-center">
                         {% if 'ROLE_ADMIN' in user.roles %}
-                            <span class="px-3 py-1 text-[10px] font-black bg-red-500 text-white rounded-lg uppercase tracking-[0.2em]">Administrador</span>
+                            <span class="px-4 py-1.5 text-[9px] font-black bg-[#e63946] text-white rounded-xl uppercase tracking-[0.3em] shadow-lg shadow-[#e63946]/20 italic">Master Admin</span>
                         {% else %}
-                            <span class="px-3 py-1 text-[10px] font-black bg-indigo-500 text-white rounded-lg uppercase tracking-[0.2em]">Jugador Oficial</span>
+                            <span class="px-4 py-1.5 text-[9px] font-black bg-[#252525] text-[#e2d9c2] rounded-xl uppercase tracking-[0.3em] border border-white/10 shadow-lg italic">Jugador Oficial</span>
                         {% endif %}
                     </div>
                 </div>
             </div>
 
-            {# Información Detallada #}
-            <div class="p-8 md:p-12 space-y-8">
+            {# Información Técnica #}
+            <div class="p-10 md:p-14 space-y-12">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                     {# Columna Email #}
-                    <div class="flex items-start gap-4">
-                        <div class="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
-                            <i class="fas fa-envelope"></i>
+                    <div class="flex items-start gap-5 group">
+                        <div class="h-12 w-12 rounded-2xl bg-[#252525] flex items-center justify-center text-gray-600 group-hover:text-[#e63946] transition-colors border border-white/5 shadow-inner">
+                            <i class="fas fa-envelope text-lg"></i>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Correo Electrónico</p>
-                            <p class="text-sm font-bold text-gray-900">{{ user.email }}</p>
+                            <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-1">Email de Acceso</p>
+                            <p class="text-sm font-black text-[#e2d9c2] uppercase tracking-tight">{{ user.email }}</p>
                         </div>
                     </div>
 
                     {# Columna Teléfono #}
-                    <div class="flex items-start gap-4">
-                        <div class="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
-                            <i class="fas fa-phone"></i>
+                    <div class="flex items-start gap-5 group">
+                        <div class="h-12 w-12 rounded-2xl bg-[#252525] flex items-center justify-center text-gray-600 group-hover:text-[#e63946] transition-colors border border-white/5 shadow-inner">
+                            <i class="fas fa-phone text-lg"></i>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Teléfono</p>
-                            <p class="text-sm font-bold text-gray-900">{{ user.phone ?? 'No registrado' }}</p>
+                            <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-1">Contacto Directo</p>
+                            <p class="text-sm font-black text-[#e2d9c2] uppercase tracking-tight">{{ user.phone ?? 'SIN REGISTRO' }}</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-8 border-t border-gray-50 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {# ID del Sistema #}
-                    <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">ID Único</p>
-                        <code class="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">#{{ user.id }}</code>
+                {# Stats de Sistema #}
+                <div class="pt-10 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-10">
+                    {# ID #}
+                    <div class="bg-[#252525]/30 p-5 rounded-3xl border border-white/5 shadow-inner">
+                        <p class="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] mb-2">Member ID</p>
+                        <code class="text-xs font-mono font-black text-[#e63946]">#{{ user.id|upper }}</code>
                     </div>
-                    {# Nota sobre Password #}
-                    <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Estado de Seguridad</p>
-                        <span class="text-xs font-bold text-emerald-500 flex items-center">
-                        <i class="fas fa-shield-check mr-2"></i> Cuenta Activa
-                    </span>
+                    {# Estado #}
+                    <div class="bg-[#252525]/30 p-5 rounded-3xl border border-white/5 shadow-inner">
+                        <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">Status Arena</p>
+                        <span class="text-xs font-black text-emerald-500 flex items-center uppercase italic">
+                            <span class="h-2 w-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span> Sistema Activo
+                        </span>
                     </div>
                 </div>
 
-                {# Botones de Acción #}
-                <div class="pt-10 flex flex-col md:flex-row gap-4">
-                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="flex-1 inline-flex items-center justify-center bg-gray-900 text-white text-xs font-black py-5 px-8 rounded-2xl hover:bg-gray-800 transition-all uppercase tracking-widest shadow-xl">
-                        <i class="fas fa-user-edit mr-2 text-indigo-400"></i> Editar Jugador
+                {# Acciones de Admin #}
+                <div class="pt-10 flex flex-col md:flex-row gap-5">
+                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="flex-1 inline-flex items-center justify-center bg-[#e2d9c2] text-[#0f0f0f] text-xs font-black py-5 px-8 rounded-[2rem] hover:bg-white transition-all uppercase tracking-[0.2em] shadow-xl italic group">
+                        <i class="fas fa-user-edit mr-3 text-[#e63946] group-hover:scale-110 transition-transform"></i> Editar Jugador
                     </a>
 
-                    <div class="md:w-max">
+                    <div class="md:w-max group">
+                        {# El include del delete_form mantendrá su estilo, pero lo envolvemos si es necesario #}
                         {{ include('user/_delete_form.html.twig') }}
                     </div>
                 </div>

@@ -1,96 +1,96 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Gestión de Jugadores - RxUp{% endblock %}
+{% block title %}Gestión de Jugadores - RXUP{% endblock %}
 
 {% block body %}
-    {# Añadimos la lógica de búsqueda en el contenedor principal #}
-    <div class="max-w-7xl mx-auto px-4 py-8"
+    <div class="max-w-7xl mx-auto px-4 py-8 md:py-12"
          x-data="{
-        search: '',
-        filterUser(name, email, phone) {
-            let s = this.search.toLowerCase();
-            return name.toLowerCase().includes(s) ||
-                   email.toLowerCase().includes(s) ||
-                   (phone && phone.toLowerCase().includes(s));
-        }
-     }">
+            search: '',
+            filterUser(name, email, phone) {
+                let s = this.search.toLowerCase();
+                return name.toLowerCase().includes(s) ||
+                       email.toLowerCase().includes(s) ||
+                       (phone && phone.toLowerCase().includes(s));
+            }
+         }">
 
-        {# Header adaptable #}
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        {# Header Estilo RXUP #}
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12 relative">
+            <div class="absolute -left-4 top-0 w-1 h-12 bg-[#e63946] rounded-full hidden md:block"></div>
             <div>
-                <span class="text-indigo-600 font-black text-[10px] uppercase tracking-[0.3em] mb-1 block">Administración</span>
-                <h1 class="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase leading-none">JUGADORES</h1>
-                <p class="text-gray-500 text-xs font-medium mt-2 uppercase tracking-wide">Gestiona los miembros de la plataforma.</p>
+                <span class="text-[#e63946] font-black text-[10px] uppercase tracking-[0.4em] mb-1 block ml-1">Member Database</span>
+                <h1 class="text-4xl md:text-5xl font-black text-[#e2d9c2] tracking-tighter uppercase italic leading-none">Jugadores</h1>
+                <p class="text-gray-500 text-[10px] font-bold mt-2 uppercase tracking-widest italic">Administración de la comunidad RXUP.</p>
             </div>
-            <a href="{{ path('app_user_new') }}" class="w-full md:w-auto inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black py-4 px-8 rounded-2xl transition-all shadow-xl shadow-indigo-100 uppercase tracking-widest">
-                <i class="fas fa-plus-circle mr-2"></i> Nuevo Jugador
+            <a href="{{ path('app_user_new') }}" class="group w-full md:w-auto inline-flex items-center justify-center bg-[#e63946] hover:bg-[#ff4d5a] text-white text-[11px] font-black py-5 px-10 rounded-2xl transition-all shadow-xl shadow-[#e63946]/20 uppercase tracking-[0.2em] italic">
+                <i class="fas fa-user-plus mr-3 group-hover:scale-110 transition-transform"></i> Nuevo Jugador
             </a>
         </div>
 
-        {# BARRA DE BÚSQUEDA PREMIUM #}
-        <div class="mb-8 relative group">
-            <div class="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                <i class="fas fa-search text-gray-300 group-focus-within:text-indigo-500 transition-colors"></i>
+        {# BARRA DE BÚSQUEDA TÁCTICA #}
+        <div class="mb-10 relative group">
+            <div class="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-600 group-focus-within:text-[#e63946] transition-colors"></i>
             </div>
             <input type="text"
                    x-model="search"
-                   placeholder="Buscar por nombre, email o teléfono..."
-                   class="block w-full bg-white border-0 rounded-[1.5rem] py-5 pl-14 pr-6 text-sm font-bold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 transition-all">
+                   placeholder="BUSCAR POR NOMBRE, EMAIL O TELÉFONO..."
+                   class="block w-full bg-[#1a1a1a] border border-white/5 rounded-[2rem] py-6 pl-16 pr-8 text-sm font-bold text-[#e2d9c2] shadow-2xl placeholder:text-gray-700 focus:ring-2 focus:ring-[#e63946] focus:outline-none transition-all uppercase tracking-tight">
 
             {# Contador dinámico #}
-            <div class="absolute inset-y-0 right-5 flex items-center">
-            <span class="text-[10px] font-black text-indigo-400 bg-indigo-50 px-3 py-1 rounded-full uppercase" x-show="search.length > 0">
-                Filtrando...
-            </span>
+            <div class="absolute inset-y-0 right-6 flex items-center">
+                <span class="text-[9px] font-black text-[#e63946] bg-[#e63946]/10 px-4 py-1.5 rounded-full uppercase tracking-widest border border-[#e63946]/20 shadow-lg" x-show="search.length > 0">
+                    Live Filtering
+                </span>
             </div>
         </div>
 
-        <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden">
+        <div class="bg-[#1a1a1a] rounded-[3rem] border border-white/5 shadow-[0_40px_80px_rgba(0,0,0,0.5)] overflow-hidden">
 
-            {# VISTA ESCRITORIO: TABLA #}
+            {# VISTA ESCRITORIO: TABLA DARK #}
             <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                    <tr class="bg-gray-50/50 border-b border-gray-100">
-                        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Jugador</th>
-                        <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Rol</th>
-                        <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Contacto</th>
-                        <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Acciones</th>
+                    <tr class="bg-white/[0.02] border-b border-white/5">
+                        <th class="px-10 py-7 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Jugador / Elite Member</th>
+                        <th class="px-6 py-7 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-center">Rango</th>
+                        <th class="px-6 py-7 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Contacto</th>
+                        <th class="px-10 py-7 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-right">Operaciones</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody class="divide-y divide-white/5">
                     {% for user in users %}
-                        <tr class="hover:bg-gray-50/50 transition-colors group"
+                        <tr class="hover:bg-white/[0.02] transition-colors group"
                             x-show="filterUser('{{ user.name|e('js') }}', '{{ user.email|e('js') }}', '{{ user.phone|default('')|e('js') }}')">
-                            <td class="px-8 py-6">
+                            <td class="px-10 py-7">
                                 <div class="flex items-center">
-                                    <div class="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-xs shadow-lg shadow-indigo-100">
+                                    <div class="h-12 w-12 rounded-2xl bg-[#252525] flex items-center justify-center text-[#e63946] font-black text-sm shadow-inner border border-white/5 group-hover:bg-[#e63946] group-hover:text-white transition-all duration-300 italic">
                                         {{ user.name|slice(0, 2)|upper }}
                                     </div>
-                                    <div class="ml-4">
-                                        <p class="text-sm font-black text-gray-900 uppercase tracking-tight">{{ user.name }}</p>
-                                        <p class="text-xs text-gray-400 font-medium">{{ user.email }}</p>
+                                    <div class="ml-5">
+                                        <p class="text-sm font-black text-[#e2d9c2] uppercase tracking-tight italic">{{ user.name }}</p>
+                                        <p class="text-[10px] text-gray-600 font-bold uppercase tracking-tighter">{{ user.email }}</p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-6 text-center">
+                            <td class="px-6 py-7 text-center">
                                 {% if 'ROLE_ADMIN' in user.roles %}
-                                    <span class="px-3 py-1 text-[9px] font-black bg-red-50 text-red-500 rounded-lg uppercase tracking-widest border border-red-100">Admin</span>
+                                    <span class="px-3 py-1.5 text-[9px] font-black bg-[#e63946]/10 text-[#e63946] rounded-lg uppercase tracking-widest border border-[#e63946]/20 shadow-sm">Master Admin</span>
                                 {% else %}
-                                    <span class="px-3 py-1 text-[9px] font-black bg-emerald-50 text-emerald-500 rounded-lg uppercase tracking-widest border border-emerald-100">Jugador</span>
+                                    <span class="px-3 py-1.5 text-[9px] font-black bg-white/5 text-gray-400 rounded-lg uppercase tracking-widest border border-white/5">Jugador</span>
                                 {% endif %}
                             </td>
-                            <td class="px-6 py-6">
-                                <span class="text-xs font-bold text-gray-600 uppercase tracking-tighter">
-                                    <i class="fas fa-phone-alt text-[10px] text-indigo-300 mr-2"></i>{{ user.phone ?? '---' }}
+                            <td class="px-6 py-7">
+                                <span class="text-xs font-black text-[#e2d9c2] tracking-widest italic flex items-center">
+                                    <i class="fas fa-phone-alt text-[10px] text-[#e63946] mr-3 opacity-70"></i>{{ user.phone ?? '---' }}
                                 </span>
                             </td>
-                            <td class="px-8 py-6 text-right">
-                                <div class="flex justify-end gap-2">
-                                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="p-2.5 bg-gray-50 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
+                            <td class="px-10 py-7 text-right">
+                                <div class="flex justify-end gap-3">
+                                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="w-10 h-10 flex items-center justify-center bg-[#252525] text-gray-500 hover:text-[#e63946] hover:bg-[#e63946]/10 rounded-xl transition-all border border-white/5">
                                         <i class="fas fa-pen text-xs"></i>
                                     </a>
-                                    <a href="{{ path('app_user_show', {'id': user.id}) }}" class="p-2.5 bg-gray-50 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all">
+                                    <a href="{{ path('app_user_show', {'id': user.id}) }}" class="w-10 h-10 flex items-center justify-center bg-[#252525] text-gray-500 hover:text-white hover:bg-white/10 rounded-xl transition-all border border-white/5">
                                         <i class="fas fa-eye text-xs"></i>
                                     </a>
                                 </div>
@@ -101,45 +101,44 @@
                 </table>
             </div>
 
-            {# VISTA MÓVIL: TARJETAS #}
-            <div class="md:hidden divide-y divide-gray-50">
+            {# VISTA MÓVIL: CARDS DARK #}
+            <div class="md:hidden divide-y divide-white/5">
                 {% for user in users %}
-                    <div class="p-5 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    <div class="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors"
                          x-show="filterUser('{{ user.name|e('js') }}', '{{ user.email|e('js') }}', '{{ user.phone|default('')|e('js') }}')">
-                        <div class="flex items-center min-w-0 mr-3">
-                            <div class="h-12 w-12 flex-shrink-0 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-lg shadow-indigo-100">
+                        <div class="flex items-center min-w-0 mr-4">
+                            <div class="h-14 w-14 flex-shrink-0 rounded-2xl bg-[#252525] flex items-center justify-center text-[#e63946] font-black text-sm border border-white/5 italic">
                                 {{ user.name|slice(0, 2)|upper }}
                             </div>
-                            <div class="ml-4 min-w-0">
-                                <div class="flex items-center gap-2 mb-0.5">
-                                    <p class="text-sm font-black text-gray-900 uppercase tracking-tight truncate">{{ user.name }}</p>
+                            <div class="ml-5 min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <p class="text-sm font-black text-[#e2d9c2] uppercase tracking-tight truncate italic">{{ user.name }}</p>
                                     {% if 'ROLE_ADMIN' in user.roles %}
-                                        <span class="h-1.5 w-1.5 bg-red-500 rounded-full"></span>
+                                        <span class="h-1.5 w-1.5 bg-[#e63946] rounded-full animate-pulse"></span>
                                     {% endif %}
                                 </div>
-                                <p class="text-[10px] text-gray-400 font-bold truncate tracking-tight uppercase">{{ user.email }}</p>
-                                <p class="text-[10px] text-indigo-500 font-black mt-1 uppercase tracking-widest">
-                                    <i class="fas fa-phone-alt mr-1 text-[8px]"></i> {{ user.phone ?? '---' }}
+                                <p class="text-[9px] text-gray-600 font-bold truncate tracking-widest uppercase mb-1">{{ user.email }}</p>
+                                <p class="text-[10px] text-[#e63946] font-black uppercase tracking-widest">
+                                    <i class="fas fa-phone-alt mr-2 text-[8px]"></i> {{ user.phone ?? '---' }}
                                 </p>
                             </div>
                         </div>
 
-                        <div class="flex flex-col gap-2">
-                            <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="h-10 w-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl border border-gray-100">
+                        <div class="flex flex-col gap-3">
+                            <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="h-11 w-11 flex items-center justify-center bg-[#252525] text-gray-500 rounded-2xl border border-white/5 active:scale-95 transition-transform">
                                 <i class="fas fa-pen text-xs"></i>
-                            </a>
-                            <a href="{{ path('app_user_show', {'id': user.id}) }}" class="h-10 w-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl border border-gray-100">
-                                <i class="fas fa-eye text-xs"></i>
                             </a>
                         </div>
                     </div>
                 {% endfor %}
             </div>
 
-            {# MENSAJE SI NO HAY RESULTADOS #}
-            <div class="p-20 text-center" x-show="search !== '' && $el.closest('.bg-white').querySelectorAll('tbody tr[style*=\'display: none\']').length === {{ users|length }}">
-                <i class="fas fa-search text-gray-200 text-4xl mb-4 block"></i>
-                <p class="text-gray-400 font-black uppercase text-xs tracking-widest">No hay coincidencias con tu búsqueda</p>
+            {# MENSAJE VACÍO #}
+            <div class="p-24 text-center bg-[#1a1a1a]"
+                 x-show="search !== ''"
+                 x-transition:enter="transition ease-out duration-300">
+                <i class="fas fa-user-secret text-gray-800 text-5xl mb-6 block"></i>
+                <p class="text-gray-600 font-black uppercase text-[10px] tracking-[0.4em]">Sin coincidencias en la arena</p>
             </div>
         </div>
     </div>

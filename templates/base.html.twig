@@ -1,128 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html class="h-full">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Padel App{% endblock %}</title>
+    <title>{% block title %}RXUP - Tu Padel{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     {% block stylesheets %}{% endblock %}
     <style>
         [x-cloak] { display: none !important; }
+        .font-black { font-weight: 900; }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .bolt-flicker { animation: flicker 2s infinite; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans" x-data="{ mobileMenu: false }">
+<body class="bg-[#0f0f0f] text-[#e2d9c2] font-sans min-h-full" x-data="{ mobileMenu: false }">
 
-<nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
+{# Navbar Estilo RXUP #}
+<nav class="bg-[#1a1a1a] border-b border-white/5 sticky top-0 z-50 shadow-2xl">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+        <div class="flex justify-between h-20">
 
-            {# Logo #}
+            {# Logo RXUP #}
             <div class="flex items-center">
-                <a href="{{ path('app_home') }}" class="font-black text-xl tracking-tighter text-indigo-600 flex items-center">
-                    <span class="bg-indigo-600 text-white px-2 py-1 rounded-lg mr-2 text-sm italic">RX</span> UP PADEL
+                <a href="{{ path('app_home') }}" class="flex items-center group">
+                    <div class="relative h-10 w-10 bg-[#e63946] rounded-xl rotate-3 flex items-center justify-center shadow-lg shadow-[#e63946]/20 transition-transform group-hover:rotate-0">
+                        <i class="fas fa-bolt text-white -rotate-3 text-xl bolt-flicker"></i>
+                    </div>
+                    <span class="ml-3 font-black text-2xl tracking-tighter uppercase italic">
+                        RX<span class="text-[#e63946]">UP</span>
+                    </span>
                 </a>
             </div>
 
-            {# Enlaces Escritorio (Hidden on Mobile) #}
-            <div class="hidden md:flex items-center space-x-6">
+            {# Enlaces Escritorio #}
+            <div class="hidden md:flex items-center space-x-8">
                 {% if app.user %}
                     {% if is_granted('ROLE_ADMIN') %}
-                        <div class="flex items-center space-x-4 border-r border-gray-100 pr-6 mr-2">
-                            <a href="{{ path('app_user_index') }}" class="text-xs font-black text-gray-400 hover:text-indigo-600 uppercase tracking-widest">Usuarios</a>
-                            <a href="{{ path('app_admin_tournament_index') }}" class="text-xs font-black text-red-500 hover:text-red-600 uppercase tracking-widest">Panel Admin</a>
+                        <div class="flex items-center space-x-6 border-r border-white/10 pr-8">
+                            <a href="{{ path('app_user_index') }}" class="text-[10px] font-black text-gray-500 hover:text-[#e2d9c2] uppercase tracking-[0.2em] transition-colors">Jugadores</a>
+                            <a href="{{ path('app_admin_tournament_index') }}" class="text-[10px] font-black text-[#e63946] hover:text-[#ff4d5a] uppercase tracking-[0.2em] transition-colors">Panel Admin</a>
                         </div>
                     {% endif %}
 
-                    <a href="{{ path('app_tournament_index') }}" class="text-xs font-black text-gray-500 hover:text-indigo-600 uppercase tracking-widest">Torneos</a>
-                    <a href="{{ path('app_my_games') }}" class="text-xs font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl hover:bg-indigo-100 transition-all">🎾 Mis Partidos</a>
+                    <a href="{{ path('app_tournament_index') }}" class="text-[10px] font-black text-gray-400 hover:text-white uppercase tracking-[0.2em]">Competiciones</a>
+                    <a href="{{ path('app_my_games') }}" class="text-[10px] font-black bg-[#e63946] text-white px-6 py-3 rounded-2xl hover:bg-[#ff4d5a] transition-all shadow-lg shadow-[#e63946]/20 uppercase tracking-[0.2em]">
+                        🎾 Mis Partidos
+                    </a>
 
-                    <div class="flex items-center ml-4 pl-4 border-l border-gray-100">
+                    <div class="flex items-center ml-4 pl-6 border-l border-white/10">
                         <div class="flex flex-col items-end leading-none">
-                            <span class="text-[10px] uppercase font-black text-gray-900 tracking-tighter">{{ app.user.name }}</span>
-                            <a href="{{ path('app_logout') }}" class="text-[9px] text-gray-400 hover:text-red-500 font-bold uppercase tracking-widest">Salir</a>
+                            <span class="text-[11px] uppercase font-black text-[#e2d9c2] tracking-tighter">{{ app.user.name }}</span>
+                            <a href="{{ path('app_logout') }}" class="text-[9px] text-[#e63946] hover:underline font-black uppercase tracking-widest mt-1">Salir</a>
                         </div>
                     </div>
-                {% else %}
-                    <a href="{{ path('app_login') }}" class="text-xs font-black text-indigo-600 uppercase tracking-widest border-2 border-indigo-600 px-5 py-2 rounded-xl hover:bg-indigo-600 hover:text-white transition-all">Entrar</a>
                 {% endif %}
             </div>
 
-            {# Botón Hamburguesa (Only Mobile) #}
-            <div class="flex items-center md:hidden">
-                <button @click="mobileMenu = !mobileMenu" class="text-gray-500 hover:text-indigo-600 focus:outline-none p-2">
-                    <i class="fa-solid" :class="mobileMenu ? 'fa-xmark text-xl' : 'fa-bars-staggered text-xl'"></i>
-                </button>
-            </div>
+            {# Botón Hamburguesa Móvil - Solo se muestra si hay usuario #}
+            {% if app.user %}
+                <div class="flex items-center md:hidden">
+                    <button @click="mobileMenu = !mobileMenu" class="text-[#e2d9c2] p-2 focus:outline-none">
+                        <i class="fa-solid text-2xl" :class="mobileMenu ? 'fa-xmark' : 'fa-bars-staggered'"></i>
+                    </button>
+                </div>
+            {% endif %}
         </div>
     </div>
 
-    {# Menú Móvil Desplegable #}
-    <div x-show="mobileMenu"
-         x-cloak
-         x-collapse
-         @click.away="mobileMenu = false"
-         class="md:hidden bg-white border-t border-gray-50 pb-6 px-4 shadow-xl">
+    {# Menú Móvil RXUP #}
+    {% if app.user %}
+        <div x-show="mobileMenu"
+             x-cloak
+             x-collapse
+             @click.away="mobileMenu = false"
+             class="md:hidden bg-[#1a1a1a] border-t border-white/5 pb-8 px-6 shadow-2xl">
 
-        <div class="flex flex-col space-y-2 pt-4">
-            {% if app.user %}
-                {# Sección Perfil Móvil #}
-                <div class="bg-gray-50 p-4 rounded-2xl mb-4 flex items-center justify-between">
+            <div class="flex flex-col space-y-3 pt-6">
+                <div class="bg-[#252525] p-5 rounded-3xl mb-4 flex items-center justify-between border border-white/5">
                     <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Conectado como</p>
-                        <p class="font-black text-gray-900">{{ app.user.name }}</p>
+                        <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Perfil</p>
+                        <p class="font-black text-[#e2d9c2] uppercase tracking-tighter">{{ app.user.name }}</p>
                     </div>
-                    <a href="{{ path('app_logout') }}" class="h-10 w-10 bg-white border border-red-100 text-red-500 rounded-xl flex items-center justify-center">
+                    <a href="{{ path('app_logout') }}" class="h-12 w-12 bg-[#0f0f0f] text-[#e63946] rounded-2xl flex items-center justify-center border border-[#e63946]/20">
                         <i class="fa-solid fa-power-off"></i>
                     </a>
                 </div>
 
-                <a href="{{ path('app_my_games') }}" class="flex items-center p-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-indigo-200">
-                    <i class="fa-solid fa-racquet text-lg mr-3"></i> Mis Partidos
+                <a href="{{ path('app_my_games') }}" class="flex items-center p-5 bg-[#e63946] text-white rounded-3xl font-black uppercase text-xs tracking-[0.2em] shadow-xl shadow-[#e63946]/20">
+                    <i class="fa-solid fa-bolt mr-4"></i> Mis Partidos
                 </a>
 
-                <a href="{{ path('app_tournament_index') }}" class="flex items-center p-4 text-gray-700 font-black uppercase text-xs tracking-widest">
-                    <i class="fa-solid fa-trophy w-8"></i> Torneos
+                <a href="{{ path('app_tournament_index') }}" class="flex items-center p-5 text-[#e2d9c2] font-black uppercase text-xs tracking-[0.2em]">
+                    <i class="fa-solid fa-trophy w-8 text-gray-600"></i> Torneos
                 </a>
 
                 {% if is_granted('ROLE_ADMIN') %}
-                    <div class="mt-4 pt-4 border-t border-gray-100">
-                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] mb-3 ml-4">Administración</p>
-                        <a href="{{ path('app_admin_tournament_index') }}" class="flex items-center p-4 text-red-500 font-black uppercase text-xs tracking-widest bg-red-50 rounded-2xl mb-2">
-                            <i class="fa-solid fa-lock w-8"></i> Panel Admin
+                    <div class="mt-6 pt-6 border-t border-white/5 space-y-2">
+                        <p class="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] mb-4 ml-4">Admin Zone</p>
+                        <a href="{{ path('app_admin_tournament_index') }}" class="flex items-center p-5 text-[#e63946] font-black uppercase text-xs tracking-[0.2em] bg-[#e63946]/5 rounded-3xl">
+                            <i class="fa-solid fa-shield-halved w-8"></i> Panel Admin
                         </a>
-                        <a href="{{ path('app_user_index') }}" class="flex items-center p-4 text-gray-700 font-black uppercase text-xs tracking-widest">
-                            <i class="fa-solid fa-users w-8"></i> Gestionar Usuarios
-                        </a>
-                        <a href="{{ path('app_user_new') }}" class="flex items-center p-4 text-emerald-600 font-black uppercase text-xs tracking-widest">
-                            <i class="fa-solid fa-plus w-8"></i> Nuevo Jugador
+                        <a href="{{ path('app_user_index') }}" class="flex items-center p-5 text-[#e2d9c2] font-black uppercase text-xs tracking-[0.2em]">
+                            <i class="fa-solid fa-users w-8 text-gray-600"></i> Jugadores
                         </a>
                     </div>
                 {% endif %}
-
-            {% else %}
-                <a href="{{ path('app_login') }}" class="flex items-center justify-center p-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest">
-                    Entrar a la App
-                </a>
-            {% endif %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 </nav>
 
-<main class="pb-12">
-    {# Mensajes Flash #}
+<main class="relative">
+    {# Mensajes Flash Estilizados #}
     {% for label, messages in app.flashes %}
         {% for message in messages %}
-            <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
-                <div class="{% if label == 'success' %}bg-emerald-50 text-emerald-700 border-emerald-200{% else %}bg-indigo-50 text-indigo-700 border-indigo-200{% endif %} border rounded-2xl p-4 flex items-center shadow-sm">
-                    <i class="fas fa-check-circle mr-3"></i>
-                    <p class="text-xs font-black uppercase tracking-tight">{{ message }}</p>
+            <div class="max-w-4xl mx-auto mt-6 px-4 relative z-50">
+                <div class="{% if label == 'success' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20{% else %}bg-[#e63946]/10 text-[#e63946] border-[#e63946]/20{% endif %} border-2 rounded-2xl p-5 flex items-center shadow-2xl backdrop-blur-md">
+                    <i class="fas fa-bolt mr-4"></i>
+                    <p class="text-xs font-black uppercase tracking-widest">{{ message }}</p>
                 </div>
             </div>
         {% endfor %}
     {% endfor %}
 
-    {% block body %}{% endblock %}
+    <div class="py-6">
+        {% block body %}{% endblock %}
+    </div>
 </main>
 
 {% block javascripts %}
