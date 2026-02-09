@@ -31,10 +31,13 @@ COPY . .
 # 6. Crear carpetas necesarias y asegurar que existen antes del chmod
 RUN mkdir -p var/cache var/log var/sessions
 
-# 7. Generar Autoloader y dar permisos (El orden importa)
-RUN composer dump-autoload --optimize --no-dev --classmap-authoritative
-RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 775 /var/www/html/var
+# 7. Generar Autoloader SIN optimización autoritativa (que a veces genera caché de solo lectura)
+RUN composer dump-autoload --optimize --no-dev
+
+# Aseguramos que la carpeta var esté REALMENTE vacía y con permisos de escritura total
+RUN rm -rf var/cache/* && mkdir -p var/cache var/log var/sessions
+RUN chown -R www-data:www-data /var/www/html/var
+RUN chmod -R 777 /var/www/html/var
 
 # 8. Asegurar que el script sea ejecutable
 RUN chmod +x /var/www/html/docker-entrypoint.sh
