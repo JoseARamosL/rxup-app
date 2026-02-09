@@ -36,9 +36,12 @@ RUN composer dump-autoload --optimize --no-dev --classmap-authoritative
 RUN chown -R www-data:www-data /var/www/html
 RUN chmod -R 775 /var/www/html/var
 
-# 8. Asegurar que el script de entrada sea ejecutable
-RUN chmod +x docker-entrypoint.sh
-RUN cp docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+# 8. Asegurar que el script sea ejecutable
+RUN chmod +x /var/www/html/docker-entrypoint.sh
+RUN ln -s /var/www/html/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+# MUY IMPORTANTE: Nos aseguramos de ser ROOT para el entrypoint
+USER root
 
 EXPOSE 80
 
