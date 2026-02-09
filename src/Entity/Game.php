@@ -41,6 +41,12 @@ class Game
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $score = null;
 
+    #[ORM\ManyToOne(inversedBy: 'games')]
+    private ?Team $team1 = null;
+
+    #[ORM\ManyToOne(inversedBy: 'games')]
+    private ?Team $team2 = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -150,6 +156,30 @@ class Game
     public function setScore(?string $score): static
     {
         $this->score = $score;
+
+        return $this;
+    }
+
+    public function getTeam1(): ?Team
+    {
+        return $this->team1;
+    }
+
+    public function setTeam1(?Team $team1): static
+    {
+        $this->team1 = $team1;
+
+        return $this;
+    }
+
+    public function getTeam2(): ?Team
+    {
+        return $this->team2;
+    }
+
+    public function setTeam2(?Team $team2): static
+    {
+        $this->team2 = $team2;
 
         return $this;
     }

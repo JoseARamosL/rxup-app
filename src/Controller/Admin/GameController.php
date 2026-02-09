@@ -3,7 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Game;
+use App\Entity\Team;
 use App\Entity\Tournament;
+use App\Entity\User;
 use App\Repository\GameRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,18 +13,52 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Form\GameType;
+use App\Repository\TeamRepository;
 use App\Service\RankingCalculator;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 #[Route('/admin/tournament/{id}/games')]
 class GameController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_game_index', methods: ['GET'])]
-    public function index(Tournament $tournament, GameRepository $gameRepository): Response
-    {
+    #[Route('/', name: 'app_admin_game_index', methods: ['GET', 'POST'])]
+    public function index(
+    Tournament $tournament,
+    GameRepository $gameRepository,
+    TeamRepository $teamRepository,
+    Request $request,
+    EntityManagerInterface $entityManager
+    ): Response {
+        // --- Lógica para CREAR PAREJA ---
+        $team = new Team();
+        $team->setTournament($tournament);
+
+        $teamForm = $this->createFormBuilder($team)
+            ->add('player1', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => 'name',
+                'placeholder' => 'Selecciona Jugador 1',
+            ])
+            ->add('player2', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => 'name',
+                'placeholder' => 'Selecciona Jugador 2',
+            ])
+            ->getForm();
+
+        $teamForm->handleRequest($request);
+
+        if ($teamForm->isSubmitted() && $teamForm->isValid()) {
+            $entityManager->persist($team);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Pareja registrada con éxito.');
+            return $this->redirectToRoute('app_admin_game_index', ['id' => $tournament->getId()]);
+        }
+        // --------------------------------
+
         $games = $gameRepository->findBy(['tournament' => $tournament], ['date' => 'ASC']);
 
-        // Agrupamos manualmente por fase
         $groupedGames = [];
         foreach ($games as $game) {
             $groupedGames[$game->getPhase()][] = $game;
@@ -30,7 +66,9 @@ class GameController extends AbstractController
 
         return $this->render('admin/game/index.html.twig', [
             'tournament' => $tournament,
-            'groupedGames' => $groupedGames, // Pasamos la variable ya agrupada
+            'groupedGames' => $groupedGames,
+            'teams' => $teamRepository->findBy(['tournament' => $tournament]), // Pasamos las parejas existentes
+            'teamForm' => $teamForm->createView(), // Pasamos el formulario a la vista
         ]);
     }
 

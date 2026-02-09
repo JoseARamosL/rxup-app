@@ -4,51 +4,63 @@
 
 {% block body %}
 <div class="max-w-6xl mx-auto py-10 px-4">
-    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+    {# Encabezado #}
+    <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">🏆 Clasificación de Liga</h1>
-            <p class="text-gray-500 text-sm">Torneo: {{ tournament.name }}</p>
+            <span class="text-indigo-600 font-black text-xs uppercase tracking-[0.3em] mb-1 block">Live Standings</span>
+            <h1 class="text-4xl font-black text-gray-900 tracking-tighter uppercase">🏆 Clasificación</h1>
+            <p class="text-gray-400 text-sm font-medium">Torneo: <span class="text-gray-900">{{ tournament.name }}</span></p>
         </div>
-        <a href="{{ path('app_admin_game_index', {id: tournament.id}) }}" class="bg-white border border-gray-300 px-4 py-2 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm">
-            Volver al Calendario
+        <a href="{{ path('app_admin_game_index', {id: tournament.id}) }}" class="bg-white border border-gray-200 px-6 py-3 rounded-2xl text-xs font-black text-gray-700 hover:bg-gray-50 transition shadow-sm uppercase tracking-widest flex items-center">
+            <i class="fas fa-calendar-alt mr-2"></i> Ver Partidos
         </a>
     </div>
 
-    <div class="bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-100">
+    {# Tabla Card #}
+    <div class="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[2.5rem] overflow-hidden border border-gray-100">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                    <tr>
-                        <th class="px-6 py-4 text-left text-gray-600">Pos / Pareja</th>
-                        <th class="px-4 py-4">Pts</th>
-                        <th class="px-4 py-4">PJ</th>
-                        <th class="px-4 py-4 text-green-600">PG</th>
-                        <th class="px-4 py-4 text-yellow-600">PE</th>
-                        <th class="px-4 py-4 text-red-600">PP</th>
-                        <th class="px-4 py-4">PF (Juegos)</th>
-                        <th class="px-4 py-4">PC</th>
-                        <th class="px-4 py-4 bg-gray-100 text-gray-700">DF</th>
+            <table class="min-w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-100">
+                        <th class="px-8 py-5 text-left">Pos / Pareja</th>
+                        <th class="px-4 py-5">Pts</th>
+                        <th class="px-4 py-5">PJ</th>
+                        <th class="px-4 py-5">PG</th>
+                        <th class="px-4 py-5">PE</th>
+                        <th class="px-4 py-5">PP</th>
+                        <th class="px-4 py-5">Juegos</th>
+                        <th class="px-6 py-5 bg-gray-50/80 text-gray-900">DF</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 text-center font-medium text-gray-700">
+                <tbody class="divide-y divide-gray-50 text-center font-bold text-gray-600">
                     {% for team, data in stats %}
-                        <tr class="{{ loop.first ? 'bg-indigo-50/30' : 'hover:bg-gray-50/50' }} transition">
-                            <td class="px-6 py-4 text-left">
-                                <span class="inline-block w-6 text-gray-400 italic text-sm">{{ loop.index }}º</span>
-                                <span class="font-bold text-gray-900 ml-2">{{ team }}</span>
+                        <tr class="{{ loop.first ? 'bg-indigo-50/20' : 'hover:bg-gray-50/30' }} transition-colors">
+                            <td class="px-8 py-5 text-left">
+                                <div class="flex items-center">
+                                    <span class="text-lg font-black {{ loop.index <= 3 ? 'text-amber-500' : 'text-gray-300' }} mr-4 w-6">
+                                        {{ loop.index }}º
+                                    </span>
+                                    <div>
+                                        {# Separamos el nombre de la pareja para que no sea una línea infinita #}
+                                        {% set players = team|split('/') %}
+                                        <p class="text-sm font-black text-gray-900 uppercase tracking-tight">{{ players[0]|trim }}</p>
+                                        <p class="text-[11px] text-indigo-500 uppercase tracking-tighter">{{ players[1]|default('')|trim }}</p>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-4 py-4">
-                                <span class="inline-block bg-indigo-600 text-white px-3 py-1 rounded-lg text-sm font-black shadow-sm">
+                            <td class="px-4 py-5">
+                                <span class="inline-flex items-center justify-center bg-indigo-600 text-white w-10 h-10 rounded-xl text-sm font-black shadow-lg shadow-indigo-200">
                                     {{ data.points }}
                                 </span>
                             </td>
-                            <td class="px-4 py-4">{{ data.pj }}</td>
-                            <td class="px-4 py-4">{{ data.pg }}</td>
-                            <td class="px-4 py-4">{{ data.pe }}</td>
-                            <td class="px-4 py-4">{{ data.pp }}</td>
-                            <td class="px-4 py-4 text-gray-500">{{ data.pf }}</td>
-                            <td class="px-4 py-4 text-gray-500">{{ data.pc }}</td>
-                            <td class="px-4 py-4 font-black {{ data.df > 0 ? 'text-green-600' : (data.df < 0 ? 'text-red-500' : 'text-gray-400') }}">
+                            <td class="px-4 py-5 text-sm">{{ data.pj }}</td>
+                            <td class="px-4 py-5 text-sm text-emerald-500">{{ data.pg }}</td>
+                            <td class="px-4 py-5 text-sm text-amber-500">{{ data.pe }}</td>
+                            <td class="px-4 py-5 text-sm text-red-400">{{ data.pp }}</td>
+                            <td class="px-4 py-5 text-[11px] text-gray-400">
+                                <span class="text-gray-700">{{ data.pf }}</span> / {{ data.pc }}
+                            </td>
+                            <td class="px-6 py-5 bg-gray-50/30 font-black text-base {{ data.df > 0 ? 'text-emerald-500' : (data.df < 0 ? 'text-red-500' : 'text-gray-400') }}">
                                 {{ data.df > 0 ? '+' : '' }}{{ data.df }}
                             </td>
                         </tr>
@@ -56,6 +68,14 @@
                 </tbody>
             </table>
         </div>
+    </div>
+
+    {# Leyenda rápida #}
+    <div class="mt-6 flex flex-wrap justify-center gap-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+        <span class="flex items-center"><i class="w-2 h-2 bg-indigo-600 rounded-full mr-2"></i> Pts: Puntos</span>
+        <span class="flex items-center"><i class="w-2 h-2 bg-gray-300 rounded-full mr-2"></i> PJ: Jugados</span>
+        <span class="flex items-center"><i class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></i> PG: Ganados</span>
+        <span class="flex items-center"><i class="w-2 h-2 bg-red-500 rounded-full mr-2"></i> DF: Dif. Juegos</span>
     </div>
 </div>
 {% endblock %}

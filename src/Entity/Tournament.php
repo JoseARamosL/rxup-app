@@ -37,9 +37,16 @@ class Tournament
     #[ORM\Column]
     private ?bool $hasRanking = true;
 
+    /**
+     * @var Collection<int, Team>
+     */
+    #[ORM\OneToMany(targetEntity: Team::class, mappedBy: 'tournament')]
+    private Collection $teams;
+
     public function __construct()
     {
         $this->games = new ArrayCollection();
+        $this->teams = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -133,6 +140,36 @@ class Tournament
     public function setHasRanking(bool $hasRanking): static
     {
         $this->hasRanking = $hasRanking;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Team>
+     */
+    public function getTeams(): Collection
+    {
+        return $this->teams;
+    }
+
+    public function addTeam(Team $team): static
+    {
+        if (!$this->teams->contains($team)) {
+            $this->teams->add($team);
+            $team->setTournament($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTeam(Team $team): static
+    {
+        if ($this->teams->removeElement($team)) {
+            // set the owning side to null (unless already changed)
+            if ($team->getTournament() === $this) {
+                $team->setTournament(null);
+            }
+        }
 
         return $this;
     }

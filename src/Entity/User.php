@@ -49,9 +49,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
    #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'player1')]
    private Collection $games;
 
+   /**
+    * @var Collection<int, Team>
+    */
+   #[ORM\OneToMany(targetEntity: Team::class, mappedBy: 'player1')]
+   private Collection $teams;
+
    public function __construct()
    {
        $this->games = new ArrayCollection();
+       $this->teams = new ArrayCollection();
    }
 
     public function getId(): ?int
@@ -192,5 +199,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // Si tiene nombre, lo muestra. Si no, muestra el teléfono o email.
         return $this->name ?: (string) ($this->phone ?: $this->email);
+    }
+
+    /**
+     * @return Collection<int, Team>
+     */
+    public function getTeams(): Collection
+    {
+        return $this->teams;
+    }
+
+    public function addTeam(Team $team): static
+    {
+        if (!$this->teams->contains($team)) {
+            $this->teams->add($team);
+            $team->setPlayer1($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTeam(Team $team): static
+    {
+        if ($this->teams->removeElement($team)) {
+            // set the owning side to null (unless already changed)
+            if ($team->getPlayer1() === $this) {
+                $team->setPlayer1(null);
+            }
+        }
+
+        return $this;
     }
 }
