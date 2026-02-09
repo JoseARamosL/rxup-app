@@ -32,4 +32,11 @@ RUN mkdir -p /var/www/html/var && \
     chown -R www-data:www-data /var/www/html/var && \
     chmod -R 775 /var/www/html/var
 
+# Copiamos el script de arranque
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 80
+
+# Usamos el script como punto de entrada
+ENTRYPOINT ["docker-entrypoint.sh"]
