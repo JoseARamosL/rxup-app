@@ -19,11 +19,11 @@ final class Version20260209002533 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // Sustituye los valores por los tuyos
-        $this->addSql("INSERT INTO \"user\" (email, roles, password, phone, name) VALUES (
+        // Usamos el esquema public para evitar conflictos con la palabra reservada 'user'
+        $this->addSql("INSERT INTO public.user (email, roles, password, phone, name) VALUES (
             'rxup2025@gmail.com',
             '[\"ROLE_ADMIN\"]',
-            '$2y$13$fiJ5K.wu6NS9cNz/zYNhOu7fP5sYDoLPCuppmlPKOEicIjUHGq766',
+            '$2y$13\$fiJ5K.wu6NS9cNz/zYNhOu7fP5sYDoLPCuppmlPKOEicIjUHGq766',
             '619337494',
             'Ale Torrejón'
         )");
