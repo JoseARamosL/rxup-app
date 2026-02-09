@@ -1,9 +1,11 @@
 #!/bin/sh
 set -e
 
-# Ejecutar migraciones antes de arrancar el servidor
+echo "Esperando a que la base de datos esté lista..."
+# Opcional: podrías añadir un sleep 2 aquí
+
 echo "Ejecutando migraciones..."
 php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
 
-# Arrancar Apache en primer plano (el comando original del Dockerfile)
-apache2-foreground
+echo "Arrancando servidor..."
+exec apache2-foreground
