@@ -27,15 +27,18 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Instalar dependencias de producción
 RUN composer install --no-dev --optimize-autoloader --no-scripts --prefer-dist --no-interaction
 
-# Asegurarnos de que las carpetas existen
-RUN mkdir -p /var/www/html/var/cache /var/www/html/var/log
+# 1. Copiamos SOLO los archivos de dependencias primero
+COPY composer.json composer.lock ./
 
-# Cambiamos el dueño de TODO el proyecto a www-data
-# Esto es lo más seguro para que Symfony no tenga problemas de escritura
-RUN chown -R www-data:www-data /var/www/html
+# 2. Instalamos SIN scripts (esto ahorra mucha RAM)
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
 
-# Damos permisos de lectura/escritura/ejecución al dueño
-RUN chmod -R 775 /var/www/html/var
+# 3. AHORA copiamos el resto del código
+COPY . /var/www/html
+
+# 4. Finalizamos el autoloader y permisos
+RUN composer dump-autoload --optimize --no-dev --classmap-authoritative
+RUN chown -R www-data:www-data /var/www/html && chmod -R 775 /var/www/html/var
 
 EXPOSE 80
 
