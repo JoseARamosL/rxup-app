@@ -27,14 +27,15 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Instalar dependencias de producción
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Creamos la carpeta var (por si no existe) y le damos permisos de escritura al usuario de Apache
-RUN mkdir -p /var/www/html/var && \
-    chown -R www-data:www-data /var/www/html/var && \
-    chmod -R 775 /var/www/html/var
+# Asegurarnos de que las carpetas existen
+RUN mkdir -p /var/www/html/var/cache /var/www/html/var/log
 
-# Copiamos el script de arranque
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+# Cambiamos el dueño de TODO el proyecto a www-data
+# Esto es lo más seguro para que Symfony no tenga problemas de escritura
+RUN chown -R www-data:www-data /var/www/html
+
+# Damos permisos de lectura/escritura/ejecución al dueño
+RUN chmod -R 775 /var/www/html/var
 
 EXPOSE 80
 
