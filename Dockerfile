@@ -25,7 +25,7 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Instalar dependencias de producción
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+RUN composer install --no-dev --optimize-autoloader --no-scripts --prefer-dist --no-interaction
 
 # Asegurarnos de que las carpetas existen
 RUN mkdir -p /var/www/html/var/cache /var/www/html/var/log
