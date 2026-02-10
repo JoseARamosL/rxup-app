@@ -31,6 +31,9 @@ final class UserController extends AbstractController
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher // Inyectamos el hasher
     ): Response {
+
+        $entityManager->getMetadataFactory()->getAllMetadata();
+
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
