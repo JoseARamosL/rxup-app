@@ -35,10 +35,12 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
     public function authenticate(Request $request): Passport
     {
         $identifier = $request->getPayload()->getString('_username');
+        $cleanIdentifier = str_replace([' '], '', $identifier);
+
         $password = $request->getPayload()->getString('_password') ?: 'nopassword';
 
         return new Passport(
-            new UserBadge($identifier, fn() => $this->userRepository->findOneByEmailOrPhone($identifier) ?: throw new UserNotFoundException()),
+            new UserBadge($cleanIdentifier, fn() => $this->userRepository->findOneByEmailOrPhone($cleanIdentifier) ?: throw new UserNotFoundException()),
             new \Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials(
                 function($credentials, User $user) {
                     if (in_array('ROLE_ADMIN', $user->getRoles())) {

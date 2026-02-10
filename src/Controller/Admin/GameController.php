@@ -27,8 +27,8 @@ class GameController extends AbstractController
     GameRepository $gameRepository,
     TeamRepository $teamRepository,
     Request $request,
-    EntityManagerInterface $entityManager
-    ): Response {
+    EntityManagerInterface $entityManager): Response
+    {
         // --- Lógica para CREAR PAREJA ---
         $team = new Team();
         $team->setTournament($tournament);
@@ -61,8 +61,14 @@ class GameController extends AbstractController
 
         $groupedGames = [];
         foreach ($games as $game) {
-            $groupedGames[$game->getPhase()][] = $game;
+            // Usamos el nombre de la fase como clave
+            $phaseName = $game->getPhase() ?: 'Sin Fase';
+            $groupedGames[$phaseName][] = $game;
         }
+
+        uksort($groupedGames, function($a, $b) {
+            return strnatcasecmp($a, $b);
+        });
 
         return $this->render('admin/game/index.html.twig', [
             'tournament' => $tournament,

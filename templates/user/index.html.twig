@@ -5,14 +5,22 @@
 {% block body %}
     <div class="max-w-7xl mx-auto px-4 py-8 md:py-12"
          x-data="{
-            search: '',
-            filterUser(name, email, phone) {
-                let s = this.search.toLowerCase();
-                return name.toLowerCase().includes(s) ||
-                       email.toLowerCase().includes(s) ||
-                       (phone && phone.toLowerCase().includes(s));
-            }
-         }">
+        search: '',
+        filterUser(name, email, phone) {
+            // 1. Normalizamos la búsqueda: minúsculas y quitamos espacios/puntos/guiones
+            let s = this.search.toLowerCase();
+            let sClean = s.replace(/[\s\-\.]/g, '');
+
+            // 2. Normalizamos el teléfono del usuario (quitamos espacios/puntos/guiones)
+            let pClean = (phone || '').replace(/[\s\-\.]/g, '');
+
+            // 3. Lógica de filtrado
+            // - El nombre y email se comparan con la búsqueda normal (s)
+            // - El teléfono se compara con la búsqueda limpia (sClean)
+            return name.toLowerCase().includes(s) ||
+                   email.toLowerCase().includes(s) ||
+                   (pClean !== '' && sClean !== '' && pClean.includes(sClean));
+        }}">
 
         {# Header Estilo RXUP #}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12 relative">
@@ -82,7 +90,8 @@
                             </td>
                             <td class="px-6 py-7">
                                 <span class="text-xs font-black text-[#e2d9c2] tracking-widest italic flex items-center">
-                                    <i class="fas fa-phone-alt text-[10px] text-[#e63946] mr-3 opacity-70"></i>{{ user.phone ?? '---' }}
+                                    <i class="fas fa-phone-alt text-[10px] text-[#e63946] mr-3 opacity-70"></i>
+                                    {{ user.phone ? user.phone|replace({' ': ''})|slice(0,3) ~ ' ' ~ user.phone|slice(3,3) ~ ' ' ~ user.phone|slice(6) : '---' }}
                                 </span>
                             </td>
                             <td class="px-10 py-7 text-right">

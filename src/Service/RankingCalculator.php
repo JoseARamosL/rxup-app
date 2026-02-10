@@ -11,6 +11,13 @@ class RankingCalculator
     {
         $ranking = [];
 
+        // --- 1. INICIALIZACIÓN: Registramos a todas las parejas del torneo con 0 ---
+        foreach ($tournament->getTeams() as $team) {
+            $teamName = $team->getPlayer1()->getName() . ' / ' . ($team->getPlayer2() ? $team->getPlayer2()->getName() : 'TBD');
+            $this->initTeam($ranking, $teamName);
+        }
+
+        // --- 2. PROCESO DE PARTIDOS: Sumamos estadísticas solo de los jugados ---
         foreach ($tournament->getGames() as $game) {
             // Solo contamos partidos que tengan resultado y AMBAS parejas asignadas
             if (!$game->getScore() || !$game->getTeam1() || !$game->getTeam2()) {
@@ -19,10 +26,11 @@ class RankingCalculator
 
             $res = $this->parseDetailedScore($game->getScore());
 
-            // Generamos el nombre de la pareja para usarlo como clave en el array
-            $teamAName = $game->getTeam1()->getPlayer1()->getName() . ' / ' . $game->getTeam1()->getPlayer2()->getName();
-            $teamBName = $game->getTeam2()->getPlayer1()->getName() . ' / ' . $game->getTeam2()->getPlayer2()->getName();
+            // Generamos el nombre de la pareja (debe coincidir con el formato de arriba)
+            $teamAName = $game->getTeam1()->getPlayer1()->getName() . ' / ' . ($game->getTeam1()->getPlayer2() ? $game->getTeam1()->getPlayer2()->getName() : 'TBD');
+            $teamBName = $game->getTeam2()->getPlayer1()->getName() . ' / ' . ($game->getTeam2()->getPlayer2() ? $game->getTeam2()->getPlayer2()->getName() : 'TBD');
 
+            // Aseguramos que existan (por si se inscribieron después)
             $this->initTeam($ranking, $teamAName);
             $this->initTeam($ranking, $teamBName);
 
@@ -53,10 +61,9 @@ class RankingCalculator
             }
         }
 
-        // Calcular Diferencia (DF) y Ordenar
+        // --- 3. CÁLCULO FINAL Y ORDENACIÓN ---
         foreach ($ranking as $name => &$data) {
             $data['df'] = $data['pf'] - $data['pc'];
-            $data['team_name'] = $name; // Guardamos el nombre para usarlo en la tabla
         }
 
         // Ordenar: 1º Puntos, 2º Diferencia de Juegos, 3º Juegos a Favor
@@ -71,7 +78,6 @@ class RankingCalculator
 
     private function parseDetailedScore(string $score): array
     {
-        // Limpiamos el score: aceptamos tanto comas como espacios como separadores de sets
         $cleanScore = str_replace([' ', '/', ';'], ',', $score);
         $sets = explode(',', $cleanScore);
 
