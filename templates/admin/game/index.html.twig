@@ -1,197 +1,216 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Calendario - {{ tournament.name }} - RXUP{% endblock %}
+{% block title %}{{ tournament.name }} — RXUP Admin{% endblock %}
+{% block page_title_mobile %}{{ tournament.name }}{% endblock %}
+
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css" rel="stylesheet">
+    <style>
+        .ts-wrapper.single .ts-control { border-radius: 0.5rem; border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; font-size: 0.875rem; box-shadow: none; }
+        .ts-wrapper.single.focus .ts-control { border-color: #111827; box-shadow: 0 0 0 1px #111827; }
+        .ts-dropdown { border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); font-size: 0.875rem; }
+        .ts-dropdown .option { padding: 0.5rem 0.75rem; }
+        .ts-dropdown .option:hover, .ts-dropdown .option.active { background: #f3f4f6; color: #111827; }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <div class="max-w-7xl mx-auto py-6 md:py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
 
-        {# Header Adaptable RXUP #}
-        <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-8 relative">
-            <div class="absolute -left-4 top-0 w-1 h-12 bg-[#e63946] rounded-full hidden md:block"></div>
+        {# Cabecera #}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-                <span class="text-[#e63946] font-black text-[10px] uppercase tracking-[0.4em] mb-1 block ml-1">Match Management</span>
-                <h1 class="text-4xl md:text-5xl font-black text-[#e2d9c2] tracking-tighter uppercase italic leading-none">{{ tournament.name }}</h1>
-                <p class="text-gray-500 font-bold italic text-[10px] uppercase tracking-widest mt-2">Gestión de partidos y parejas oficiales</p>
-            </div>
-            <div class="flex flex-wrap gap-3 w-full md:w-auto">
-                <a href="{{ path('app_admin_game_new', {id: tournament.id}) }}" class="flex-1 md:flex-none text-center bg-[#e63946] text-white px-6 py-4 rounded-2xl font-black hover:bg-[#ff4d5a] transition shadow-xl shadow-[#e63946]/20 uppercase text-[10px] tracking-widest italic">
-                    <i class="fas fa-plus mr-2"></i> Nuevo Partido
+                <a href="{{ path('app_admin_tournament_index') }}"
+                   class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-1">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                    Torneos
                 </a>
+                <h1 class="text-xl font-semibold text-gray-900">{{ tournament.name }}</h1>
+                <p class="text-sm text-gray-500 mt-0.5">Gestión de partidos</p>
+            </div>
+            <div class="flex items-center gap-2">
                 {% if tournament.hasRanking %}
-                    <a href="{{ path('app_admin_tournament_ranking', {id: tournament.id}) }}" class="flex-1 md:flex-none text-center bg-[#e2d9c2] text-[#0f0f0f] px-6 py-4 rounded-2xl font-black hover:bg-white transition shadow-xl uppercase text-[10px] tracking-widest italic">
-                        🏆 Ranking
+                    <a href="{{ path('app_admin_tournament_ranking', {id: tournament.id}) }}"
+                       class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                        <i class="fa-solid fa-trophy text-xs text-amber-500"></i>
+                        Ranking
                     </a>
                 {% endif %}
+                <a href="{{ path('app_admin_game_new', {id: tournament.id}) }}"
+                   class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    Nuevo partido
+                </a>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-            {# SIDEBAR DE PAREJAS (Con Doble Acordeón) #}
-            <div class="lg:col-span-1 lg:order-2">
-                <div class="bg-[#1a1a1a] rounded-[2.5rem] p-8 shadow-2xl sticky top-24 border border-white/5 overflow-hidden" x-data="{ showForm: false, showList: true }">
+            {# Columna derecha: Parejas #}
+            <div class="lg:col-span-1 lg:order-2 space-y-4">
 
-                    {# ACORDEÓN 1: FORMULARIO DE INSCRIPCIÓN #}
-                    <div class="mb-4">
-                        <button @click="showForm = !showForm"
-                                class="w-full flex items-center justify-between py-2 text-[#e63946] hover:text-[#ff4d5a] transition-colors group">
-                            <h3 class="font-black uppercase tracking-[0.2em] text-[11px] flex items-center">
-                                <i class="fas fa-plus-circle mr-3 transition-transform duration-300" :class="showForm ? 'rotate-45 text-white' : ''"></i>
-                                <span x-text="showForm ? 'Cerrar Registro' : 'Nueva Pareja'"></span>
-                            </h3>
-                            <i class="fas fa-chevron-down text-[10px] transition-transform duration-300" :class="showForm ? 'rotate-180' : ''"></i>
-                        </button>
-
-                        <div x-show="showForm" x-collapse x-cloak class="mt-6 pb-8 border-b border-white/5">
-                            {{ form_start(teamForm, {'attr': {'class': 'space-y-5'}}) }}
-                            <div class="space-y-2">
-                                <label class="text-[9px] font-black text-gray-600 uppercase tracking-widest ml-2">Jugador 1</label>
-                                {# CORRECCIÓN AQUÍ: Eliminado el doble form_widget #}
-                                {{ form_widget(teamForm.player1, {'attr': {'class': 'w-full bg-[#252525] border-0 rounded-xl text-[#e2d9c2] text-xs p-4 focus:ring-2 focus:ring-[#e63946] font-bold shadow-inner'}}) }}
+                {# Formulario nueva pareja #}
+                <div class="rounded-xl border border-gray-200 bg-white overflow-hidden" x-data="{ open: false }">
+                    <button @click="open = !open"
+                            class="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-xs text-gray-400"></i>
+                            Nueva pareja
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open" x-collapse x-cloak class="border-t border-gray-100 px-4 py-4">
+                        {{ form_start(teamForm, {'attr': {'class': 'space-y-3'}}) }}
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Jugador 1</label>
+                                {{ form_widget(teamForm.player1) }}
                             </div>
-                            <div class="space-y-2">
-                                <label class="text-[9px] font-black text-gray-600 uppercase tracking-widest ml-2">Jugador 2</label>
-                                {# CORRECCIÓN AQUÍ: Eliminado el doble form_widget #}
-                                {{ form_widget(teamForm.player2, {'attr': {'class': 'w-full bg-[#252525] border-0 rounded-xl text-[#e2d9c2] text-xs p-4 focus:ring-2 focus:ring-[#e63946] font-bold shadow-inner'}}) }}
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Jugador 2</label>
+                                {{ form_widget(teamForm.player2) }}
                             </div>
-                            <button class="w-full bg-[#e63946] hover:bg-[#ff4d5a] text-white font-black py-4 rounded-xl transition-all uppercase text-[10px] tracking-[0.3em] mt-4 shadow-lg shadow-[#e63946]/20 italic">
-                                Inscribir
+                            <button type="submit"
+                                    class="w-full rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white hover:bg-gray-700 transition-colors">
+                                Inscribir pareja
                             </button>
-                            {{ form_end(teamForm) }}
-                        </div>
-                    </div>
-
-                    {# ACORDEÓN 2: LISTA DE PAREJAS #}
-                    <div class="pt-2">
-                        <button @click="showList = !showList"
-                                class="w-full flex items-center justify-between py-2 text-gray-500 hover:text-[#e2d9c2] transition-colors group">
-                            <div class="flex items-center">
-                                <h3 class="font-black uppercase tracking-[0.2em] text-[10px]">Parejas Inscritas</h3>
-                                <span class="ml-3 bg-[#252525] text-[#e63946] text-[10px] font-black px-2 py-0.5 rounded-lg border border-white/5">{{ teams|length }}</span>
-                            </div>
-                            <i class="fas fa-chevron-down text-[10px] transition-transform duration-300" :class="showList ? 'rotate-180' : ''"></i>
-                        </button>
-
-                        <div x-show="showList" x-collapse x-cloak class="mt-6">
-                            <div class="space-y-3 max-h-[400px] overflow-y-auto pr-3 custom-scrollbar">
-                                {% for team in teams %}
-                                    <div class="bg-[#252525] p-4 rounded-2xl border border-white/5 group hover:border-[#e63946]/40 transition-all shadow-inner">
-                                        {# Ambos nombres ahora con text-[#e2d9c2] y misma fuente #}
-                                        <div class="text-[10px] font-black text-[#e2d9c2] uppercase tracking-tight truncate">
-                                            {{ team.player1.name }}
-                                        </div>
-                                        <div class="text-[10px] font-black text-[#e2d9c2] uppercase tracking-tight mt-1 truncate">
-                                            {{ team.player2.name }}
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
+                        {{ form_end(teamForm) }}
                     </div>
                 </div>
+
+                {# Lista de parejas #}
+                <div class="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                        <span class="text-sm font-medium text-gray-700">Parejas</span>
+                        <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">{{ teams|length }}</span>
+                    </div>
+                    {% if teams is empty %}
+                        <p class="px-4 py-6 text-center text-xs text-gray-400">Sin parejas inscritas</p>
+                    {% else %}
+                        <ul class="divide-y divide-gray-100 max-h-80 overflow-y-auto">
+                            {% for team in teams %}
+                                <li class="flex items-center gap-3 px-4 py-3">
+                                    <div class="flex -space-x-1.5 shrink-0">
+                                        <div class="h-6 w-6 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-semibold">
+                                            {{ team.player1.name|slice(0,1)|upper }}
+                                        </div>
+                                        <div class="h-6 w-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-semibold">
+                                            {{ team.player2.name|slice(0,1)|upper }}
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-medium text-gray-800 truncate">{{ team.player1.name }}</p>
+                                        <p class="text-xs text-gray-400 truncate">{{ team.player2.name }}</p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
             </div>
 
-            {# IZQUIERDA: CALENDARIO DE PARTIDOS #}
-            <div class="lg:col-span-3 lg:order-1 space-y-6">
-                {% for phase, phaseGames in groupedGames %}
-                    <div x-data="{ open: {{ loop.first ? 'true' : 'false' }} }"
-                         class="bg-[#1a1a1a] rounded-[2.5rem] shadow-2xl border border-white/5 overflow-hidden transition-all duration-500">
+            {# Columna izquierda: Partidos por jornada #}
+            <div class="lg:col-span-3 lg:order-1 space-y-4">
+                {% if groupedGames is empty %}
+                    <div class="rounded-xl border border-gray-200 bg-white flex flex-col items-center justify-center py-16 text-center">
+                        <i class="fa-solid fa-calendar text-3xl text-gray-300 mb-3"></i>
+                        <p class="text-sm font-medium text-gray-500">No hay partidos programados</p>
+                        <p class="text-xs text-gray-400 mt-1">Crea el primero con el botón de arriba</p>
+                    </div>
+                {% else %}
+                    {% for phase, phaseGames in groupedGames %}
+                        <div class="rounded-xl border border-gray-200 bg-white overflow-hidden"
+                             x-data="{ open: {{ loop.first ? 'true' : 'false' }} }">
 
-                        {# Cabecera del Acordeón Jornada #}
-                        <button @click="open = !open"
-                                class="w-full flex items-center justify-between px-8 py-6 bg-white/[0.02] hover:bg-white/[0.05] transition-colors group">
-                            <div class="flex items-center gap-5">
-                            <span class="flex items-center justify-center w-9 h-9 rounded-xl bg-[#e63946] text-white text-[11px] font-black shadow-lg shadow-[#e63946]/20">
-                                {{ loop.index }}
-                            </span>
-                                <h3 class="font-black text-[#e2d9c2] uppercase text-xs tracking-[0.2em] italic">{{ phase }}</h3>
-                            </div>
-                            <i class="fas fa-chevron-down text-gray-600 text-xs transition-transform duration-300" :class="open ? 'rotate-180 text-[#e63946]' : ''"></i>
-                        </button>
+                            {# Cabecera jornada #}
+                            <button @click="open = !open"
+                                    class="flex w-full items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-gray-900 text-xs font-semibold text-white">
+                                        {{ loop.index }}
+                                    </span>
+                                    <span class="text-sm font-medium text-gray-900">{{ phase }}</span>
+                                    <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">{{ phaseGames|length }}</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                            </button>
 
-                        {# Lista de Partidos Corregida para PC y Móvil #}
-                        <div x-show="open" x-collapse class="border-t border-white/5">
-                            <ul class="divide-y divide-white/5">
-                                {% for game in phaseGames %}
-                                    <li class="p-4 md:p-8 hover:bg-white/[0.01] transition border-l-[6px] {{ game.score is not empty ? 'border-[#10b981]' : 'border-transparent' }}">
-                                        {# Usamos flex-wrap en móvil y flex-nowrap en PC para que no se amontone #}
-                                        <div class="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-4">
+                            {# Lista de partidos #}
+                            <div x-show="open" x-collapse class="border-t border-gray-100">
+                                <ul class="divide-y divide-gray-100">
+                                    {% for game in phaseGames %}
+                                        <li class="px-5 py-4 {{ game.score is not empty ? 'border-l-4 border-emerald-400' : 'border-l-4 border-transparent' }}">
+                                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 
-                                            {# BLOQUE ENCUENTRO (Local vs Visitante) #}
-                                            <div class="flex items-center justify-between w-full lg:w-auto lg:flex-1 lg:max-w-2xl">
-                                                {# Pareja Local #}
-                                                <div class="w-1/3 md:w-40 text-center lg:text-left">
-                                                    {% if game.team1 %}
-                                                        <p class="font-black text-[#e2d9c2] uppercase text-[10px] md:text-sm tracking-tight leading-tight">{{ game.team1.player1.name }}</p>
-                                                        <p class="font-black text-[#e2d9c2] uppercase text-[10px] md:text-sm tracking-tight leading-tight mt-1">{{ game.team1.player2.name }}</p>
-                                                    {% else %}
-                                                        <p class="text-gray-700 italic text-[10px] font-bold">TBD</p>
-                                                    {% endif %}
+                                                {# Enfrentamiento #}
+                                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                                    <div class="text-right min-w-0 flex-1">
+                                                        {% if game.team1 %}
+                                                            <p class="text-sm font-medium text-gray-900 truncate">{{ game.team1.player1.name }}</p>
+                                                            <p class="text-xs text-gray-400 truncate">{{ game.team1.player2.name }}</p>
+                                                        {% else %}
+                                                            <p class="text-sm text-gray-300">TBD</p>
+                                                        {% endif %}
+                                                    </div>
+
+                                                    <div class="shrink-0 text-center">
+                                                        {% if game.score %}
+                                                            <span class="inline-block rounded-lg bg-gray-900 px-3 py-1 text-xs font-semibold text-white font-mono">
+                                                                {{ game.score }}
+                                                            </span>
+                                                        {% else %}
+                                                            <span class="text-sm font-medium text-gray-300">vs</span>
+                                                        {% endif %}
+                                                    </div>
+
+                                                    <div class="text-left min-w-0 flex-1">
+                                                        {% if game.team2 %}
+                                                            <p class="text-sm font-medium text-gray-900 truncate">{{ game.team2.player1.name }}</p>
+                                                            <p class="text-xs text-gray-400 truncate">{{ game.team2.player2.name }}</p>
+                                                        {% else %}
+                                                            <p class="text-sm text-gray-300">TBD</p>
+                                                        {% endif %}
+                                                    </div>
                                                 </div>
 
-                                                {# VS / SCORE CORREGIDO #}
-                                                <div class="flex flex-col items-center px-2 min-w-[100px] md:min-w-[140px]">
-                                                    {% if game.score %}
-                                                        <div class="bg-[#e63946] text-white px-4 md:px-6 py-2 rounded-xl shadow-xl shadow-[#e63946]/20 font-mono text-sm md:text-lg italic font-black border-b-2 border-white/20 whitespace-nowrap tracking-tighter">
-                                                            {{ game.score }}
-                                                        </div>
-                                                    {% else %}
-                                                        <div class="text-white/10 font-black text-2xl md:text-3xl italic tracking-tighter">VS</div>
-                                                    {% endif %}
-                                                    {# Opcional: una etiqueta diminuta que indique "Resultado" #}
-                                                    {% if game.score %}
-                                                        <span class="text-[7px] uppercase font-black text-[#e63946] mt-1 tracking-widest opacity-70">Final</span>
-                                                    {% endif %}
-                                                </div>
-
-                                                {# Pareja Visitante #}
-                                                <div class="w-1/3 md:w-40 text-center lg:text-right">
-                                                    {% if game.team2 %}
-                                                        <p class="font-black text-[#e2d9c2] uppercase text-[10px] md:text-sm tracking-tight leading-tight">{{ game.team2.player1.name }}</p>
-                                                        <p class="font-black text-[#e2d9c2] uppercase text-[10px] md:text-sm tracking-tight leading-tight mt-1">{{ game.team2.player2.name }}</p>
-                                                    {% else %}
-                                                        <p class="text-gray-700 italic text-[10px] font-bold">TBD</p>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-
-                                            {# BLOQUE INFO Y ACCIONES (Se mantiene alineado a la derecha en PC) #}
-                                            <div class="flex flex-col sm:flex-row items-center justify-end w-full lg:w-auto gap-4 lg:ml-4">
-                                                {# Pista y Hora #}
-                                                <div class="text-[9px] text-gray-500 font-black uppercase tracking-widest bg-[#252525] px-4 py-2.5 rounded-xl border border-white/5 shadow-inner whitespace-nowrap text-center">
-                                                    {{ game.court|default('Pista TBD') }} • {{ game.date ? game.date|date('H:i d/m') : 'TBD' }}
-                                                </div>
-
-                                                {# Botones #}
-                                                <div class="flex items-center gap-2">
+                                                {# Info + acciones #}
+                                                <div class="flex items-center gap-2 shrink-0">
+                                                    <span class="hidden sm:inline-block rounded-md bg-gray-50 border border-gray-200 px-2.5 py-1 text-xs text-gray-500">
+                                                        {{ game.court|default('Pista TBD') }} · {{ game.date ? game.date|date('H:i d/m') : 'TBD' }}
+                                                    </span>
                                                     <a href="{{ path('app_admin_game_edit', {id: tournament.id, gameId: game.id}) }}"
-                                                       class="bg-[#252525] border border-white/10 px-4 py-2.5 md:px-5 md:py-3 rounded-xl text-[#e2d9c2] hover:bg-[#e63946] hover:text-white transition-all shadow-lg active:scale-95 flex items-center gap-2">
-                                                        <i class="fas fa-edit text-xs"></i>
-                                                        <span class="text-[9px] font-black uppercase tracking-widest">Resultado</span>
+                                                       class="rounded-md border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                                                        Resultado
                                                     </a>
-
-                                                    <form method="post" action="{{ path('app_admin_game_delete', {id: tournament.id, gameId: game.id}) }}" onsubmit="return confirm('¿Borrar?');" class="inline">
+                                                    <form method="post" action="{{ path('app_admin_game_delete', {id: tournament.id, gameId: game.id}) }}"
+                                                          onsubmit="return confirm('¿Eliminar este partido?');" class="inline">
                                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ game.id) }}">
-                                                        <button class="p-2 text-gray-700 hover:text-[#e63946] transition-colors">
-                                                            <i class="fas fa-trash-alt text-sm"></i>
+                                                        <button type="submit"
+                                                                class="rounded-md border border-gray-200 p-1.5 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors">
+                                                            <i class="fa-solid fa-trash-alt text-xs"></i>
                                                         </button>
                                                     </form>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                {% endif %}
             </div>
+
         </div>
     </div>
+{% endblock %}
 
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #111; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e63946; border-radius: 10px; }
-    </style>
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <script>
+        document.querySelectorAll('select').forEach(function(el) {
+            new TomSelect(el, { placeholder: 'Buscar jugador...', searchField: ['text'], maxOptions: null });
+        });
+    </script>
 {% endblock %}

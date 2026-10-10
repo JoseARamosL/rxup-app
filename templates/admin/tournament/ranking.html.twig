@@ -1,110 +1,86 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Ranking - {{ tournament.name }} - RXUP{% endblock %}
+{% block title %}Ranking {{ tournament.name }} — RXUP Admin{% endblock %}
+{% block page_title_mobile %}Ranking{% endblock %}
 
 {% block body %}
-    <div class="max-w-6xl mx-auto py-6 md:py-10 px-2 sm:px-4">
+    <div class="max-w-4xl mx-auto">
 
-        {# Encabezado Estilo Arena #}
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6 px-4 relative">
-            <div class="absolute -left-2 top-0 w-1 h-12 bg-[#e63946] rounded-full hidden md:block"></div>
+        {# Cabecera #}
+        <div class="flex items-center justify-between mb-6">
             <div>
-                <span class="text-[#e63946] font-black text-[10px] uppercase tracking-[0.4em] mb-1 block ml-1">Live Standings</span>
-                <h1 class="text-4xl md:text-5xl font-black text-[#e2d9c2] tracking-tighter uppercase italic leading-none">🏆 Clasificación</h1>
-                <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-2">Arena: <span class="text-[#e2d9c2]">{{ tournament.name }}</span></p>
+                <a href="{{ path('app_admin_game_index', {id: tournament.id}) }}"
+                   class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-2">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                    Volver a partidos
+                </a>
+                <h1 class="text-xl font-semibold text-gray-900">Clasificación</h1>
+                <p class="text-sm text-gray-500 mt-0.5">{{ tournament.name }}</p>
             </div>
-            <a href="{{ path('app_admin_game_index', {id: tournament.id}) }}" class="w-full md:w-auto bg-[#1a1a1a] border border-white/10 px-8 py-4 rounded-[1.5rem] text-[10px] font-black text-[#e2d9c2] hover:bg-[#e63946] hover:text-white transition-all shadow-2xl uppercase tracking-[0.2em] flex items-center justify-center group">
-                <i class="fas fa-calendar-alt mr-3 group-hover:rotate-12 transition-transform"></i> Ver Partidos
-            </a>
         </div>
 
-        {# Tabla Card Dark #}
-        <div class="bg-[#1a1a1a] shadow-[0_30px_60px_rgba(0,0,0,0.4)] rounded-[2.5rem] overflow-hidden border border-white/5 relative">
-            <div class="overflow-x-hidden">
-                <table class="w-full border-collapse">
-                    <thead>
-                    <tr class="bg-white/[0.03] text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] border-b border-white/5">
-                        <th class="pl-6 pr-2 md:px-10 py-6 text-left italic">Pareja</th>
-                        <th class="px-2 py-6 text-center">Pts</th>
-                        <th class="hidden md:table-cell px-4 py-6 text-center">PJ</th>
-                        <th class="hidden md:table-cell px-4 py-6 text-center text-emerald-500/70">PG</th>
-                        <th class="hidden md:table-cell px-4 py-6 text-center text-amber-500/70">PE</th>
-                        <th class="hidden md:table-cell px-4 py-6 text-center text-red-400/70">PP</th>
-                        <th class="md:hidden px-2 py-6 text-center italic text-gray-600">Récord</th>
-                        <th class="px-2 md:px-4 py-6 text-center">Juegos</th>
-                        <th class="pr-6 pl-2 md:px-8 py-6 bg-white/[0.03] text-[#e2d9c2] text-center">DF</th>
+        {# Tabla #}
+        <div class="rounded-xl border border-gray-200 bg-white overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-100">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Pareja</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Pts</th>
+                        <th class="hidden md:table-cell px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">PJ</th>
+                        <th class="hidden md:table-cell px-4 py-3 text-center text-xs font-semibold text-emerald-600 uppercase tracking-wider">PG</th>
+                        <th class="hidden md:table-cell px-4 py-3 text-center text-xs font-semibold text-amber-600 uppercase tracking-wider">PE</th>
+                        <th class="hidden md:table-cell px-4 py-3 text-center text-xs font-semibold text-red-500 uppercase tracking-wider">PP</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Juegos</th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">DF</th>
                     </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5 text-center">
+                </thead>
+                <tbody class="divide-y divide-gray-100">
                     {% for team, data in stats %}
-                        <tr class="{{ loop.index <= 3 ? 'bg-[#e63946]/5' : '' }} hover:bg-white/[0.02] transition-colors group">
-                            {# Celda de Pareja #}
-                            <td class="pl-6 pr-2 md:px-10 py-5 text-left">
-                                <div class="flex items-center">
-                                    <span class="text-xs md:text-xl font-black {{ loop.index <= 3 ? 'text-[#e63946]' : 'text-gray-700' }} mr-4 md:mr-6 w-5 md:w-8 italic">
-                                        {{ loop.index }}º
+                        <tr class="hover:bg-gray-50 transition-colors {{ loop.index <= 3 ? 'bg-amber-50/50' : '' }}">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-sm font-semibold w-6 text-center {{ loop.index == 1 ? 'text-amber-500' : (loop.index == 2 ? 'text-gray-400' : (loop.index == 3 ? 'text-orange-400' : 'text-gray-400')) }}">
+                                        {{ loop.index }}
                                     </span>
-                                    <div class="min-w-0 leading-tight">
+                                    <div class="min-w-0">
                                         {% set players = team|split('/') %}
-                                        <p class="text-[10px] md:text-sm font-black text-[#e2d9c2] uppercase tracking-tight truncate group-hover:text-white transition-colors">
-                                            {{ players[0]|trim }}
-                                        </p>
-                                        <p class="text-[10px] md:text-sm font-black text-[#e2d9c2] uppercase tracking-tight truncate opacity-40">
-                                            {{ players[1]|default('')|trim }}
-                                        </p>
+                                        <p class="text-sm font-medium text-gray-900 truncate">{{ players[0]|trim }}</p>
+                                        <p class="text-xs text-gray-400 truncate">{{ players[1]|default('')|trim }}</p>
                                     </div>
                                 </div>
                             </td>
-
-                            {# Puntos (Badge RXUP) #}
-                            <td class="px-1 md:px-4 py-5">
-                                <span class="inline-flex items-center justify-center bg-[#e63946] text-white w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-2xl text-[11px] md:text-base font-black shadow-lg shadow-[#e63946]/20 italic">
+                            <td class="px-4 py-4 text-center">
+                                <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gray-900 text-xs font-semibold text-white">
                                     {{ data.points }}
                                 </span>
                             </td>
-
-                            {# Record Desktop #}
-                            <td class="hidden md:table-cell px-4 py-5 text-xs font-bold text-gray-500">{{ data.pj }}</td>
-                            <td class="hidden md:table-cell px-4 py-5 text-xs font-bold text-emerald-500">{{ data.pg }}</td>
-                            <td class="hidden md:table-cell px-4 py-5 text-xs font-bold text-amber-500">{{ data.pe }}</td>
-                            <td class="hidden md:table-cell px-4 py-5 text-xs font-bold text-red-400">{{ data.pp }}</td>
-
-                            {# Record Mobile #}
-                            <td class="md:hidden px-1 py-5">
-                                <div class="text-[#e2d9c2] font-black text-[10px]">{{ data.pj }} <span class="text-gray-600 font-bold text-[8px]">PJ</span></div>
-                                <div class="flex justify-center gap-1.5 mt-1 font-black text-[9px]">
-                                    <span class="text-emerald-500">{{ data.pg }}</span>
-                                    <span class="text-amber-500">{{ data.pe }}</span>
-                                    <span class="text-red-400">{{ data.pp }}</span>
-                                </div>
+                            <td class="hidden md:table-cell px-4 py-4 text-center text-sm text-gray-500">{{ data.pj }}</td>
+                            <td class="hidden md:table-cell px-4 py-4 text-center text-sm font-medium text-emerald-600">{{ data.pg }}</td>
+                            <td class="hidden md:table-cell px-4 py-4 text-center text-sm font-medium text-amber-600">{{ data.pe }}</td>
+                            <td class="hidden md:table-cell px-4 py-4 text-center text-sm font-medium text-red-500">{{ data.pp }}</td>
+                            <td class="px-4 py-4 text-center text-sm text-gray-500">
+                                <span class="text-gray-900 font-medium">{{ data.pf }}</span>
+                                <span class="text-gray-300 mx-1">/</span>
+                                <span>{{ data.pc }}</span>
                             </td>
-
-                            {# Juegos #}
-                            <td class="px-1 md:px-4 py-5">
-                                <div class="text-[9px] md:text-[11px] font-black leading-none">
-                                    <span class="text-[#e2d9c2] block md:inline">{{ data.pf }}</span>
-                                    <span class="hidden md:inline text-gray-700 mx-1">/</span>
-                                    <span class="block md:inline text-gray-500 text-[8px] md:text-[11px] italic">{{ data.pc }}</span>
-                                </div>
-                            </td>
-
-                            {# Diferencia (Color dinámico) #}
-                            <td class="pr-6 pl-2 md:px-8 py-5 bg-white/[0.03] font-black text-xs md:text-lg italic {{ data.df > 0 ? 'text-emerald-500' : (data.df < 0 ? 'text-red-500' : 'text-gray-600') }}">
+                            <td class="px-6 py-4 text-center text-sm font-semibold {{ data.df > 0 ? 'text-emerald-600' : (data.df < 0 ? 'text-red-500' : 'text-gray-400') }}">
                                 {{ data.df > 0 ? '+' : '' }}{{ data.df }}
                             </td>
                         </tr>
                     {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
         </div>
 
-        {# Leyenda RXUP #}
-        <div class="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-3 text-[9px] font-black text-gray-600 uppercase tracking-[0.2em] px-6">
-            <span class="flex items-center"><i class="w-1.5 h-1.5 bg-[#e63946] rounded-full mr-2"></i> Pts: Puntos</span>
-            <span class="flex items-center"><i class="w-1.5 h-1.5 bg-gray-500 rounded-full mr-2"></i> PJ: Jugados</span>
-            <span class="flex items-center"><i class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-2"></i> G/E/P: Récord</span>
-            <span class="flex items-center"><i class="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2"></i> DF: Dif. Juegos</span>
+        {# Leyenda #}
+        <div class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-400">
+            <span>Pts: Puntos</span>
+            <span>PJ: Jugados</span>
+            <span class="text-emerald-600">PG: Ganados</span>
+            <span class="text-amber-600">PE: Empatados</span>
+            <span class="text-red-500">PP: Perdidos</span>
+            <span>DF: Diferencia de juegos</span>
         </div>
+
     </div>
 {% endblock %}

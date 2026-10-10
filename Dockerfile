@@ -5,9 +5,10 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libicu-dev \
     libzip-dev \
+    libgd-dev \
     zip \
     unzip \
-    && docker-php-ext-install intl pdo pdo_pgsql zip
+    && docker-php-ext-install intl pdo pdo_pgsql zip gd
 
 RUN a2enmod rewrite
 

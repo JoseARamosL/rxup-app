@@ -1,6 +1,9 @@
-<form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a este jugador? Esta acción no se puede deshacer.');">
+<form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}"
+      onsubmit="return confirm('¿Eliminar a {{ user.name }}? Esta acción no se puede deshacer.');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-    <button class="w-full text-center text-[10px] font-black text-red-300 hover:text-red-500 uppercase tracking-[0.2em] transition-colors">
-        Eliminar Jugador definitivamente
+    <button type="submit"
+            class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+        <i class="fa-solid fa-trash-alt text-xs"></i>
+        Eliminar jugador
     </button>
 </form>

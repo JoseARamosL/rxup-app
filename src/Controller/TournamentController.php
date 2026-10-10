@@ -17,13 +17,16 @@ class TournamentController extends AbstractController
     {
         // Aquí el usuario verá todos los torneos disponibles
         return $this->render('tournament/index.html.twig', [
-            'tournaments' => $repository->findAll(),
+            'tournaments' => $repository->findBy(['active' => true], ['id' => 'DESC']),
         ]);
     }
 
     #[Route('/torneos/{id}', name: 'app_tournament_show', methods: ['GET'])]
     public function show(Tournament $tournament, RankingCalculator $calculator): Response
     {
+        if (!$tournament->isActive()) {
+            throw $this->createNotFoundException('Este torneo no está disponible.');
+        }
         // Agrupamos los partidos por fase para que el usuario los vea ordenados
         $groupedGames = [];
         foreach ($tournament->getGames() as $game) {

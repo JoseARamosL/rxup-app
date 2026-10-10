@@ -1,124 +1,157 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Gestión de Torneos - RXUP{% endblock %}
+{% block title %}Torneos — RXUP Admin{% endblock %}
+{% block page_title_mobile %}Torneos{% endblock %}
 
 {% block body %}
-    <div class="max-w-7xl mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto"
+         x-data="{ tab: 'active' }">
 
-        {# Header Adaptable RXUP #}
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-12 relative">
-            <div class="absolute -left-4 top-0 w-1 h-12 bg-[#e63946] rounded-full hidden md:block"></div>
+        {# Header #}
+        <div class="flex items-center justify-between mb-6">
             <div>
-                <span class="text-[#e63946] font-black text-[10px] uppercase tracking-[0.4em] mb-1 block ml-1">Admin Dashboard</span>
-                <h1 class="text-4xl md:text-5xl font-black text-[#e2d9c2] tracking-tighter uppercase italic leading-none">Gestión de Torneos</h1>
-                <p class="mt-2 text-[10px] text-gray-500 font-bold uppercase tracking-widest italic">Control total de las competiciones oficiales.</p>
+                <h1 class="text-xl font-semibold text-gray-900">Torneos</h1>
+                <p class="text-sm text-gray-500 mt-0.5">Gestiona todas las competiciones</p>
             </div>
-            <a href="{{ path('app_admin_tournament_new') }}" class="group w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-[#e63946] text-white text-[11px] font-black rounded-2xl shadow-xl shadow-[#e63946]/20 hover:bg-[#ff4d5a] transition-all uppercase tracking-[0.2em] italic">
-                <i class="fas fa-plus mr-2 group-hover:rotate-90 transition-transform"></i> Nuevo Torneo
+            <a href="{{ path('app_admin_tournament_new') }}"
+               class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors">
+                <i class="fa-solid fa-plus text-xs"></i>
+                Nuevo torneo
             </a>
         </div>
 
-        {# Contenedor Principal Dark #}
-        <div class="bg-[#1a1a1a] shadow-[0_30px_60px_rgba(0,0,0,0.4)] rounded-[2.5rem] overflow-hidden border border-white/5 relative">
+        {# Tabs Activos / Inactivos #}
+        <div class="flex items-center gap-1 mb-4 border-b border-gray-200">
+            <button @click="tab = 'active'"
+                    :class="tab === 'active' ? 'border-b-2 border-gray-900 text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+                    class="px-4 py-2.5 text-sm font-medium transition-colors -mb-px">
+                Activos
+                <span class="ml-1.5 rounded-full px-1.5 py-0.5 text-xs"
+                      :class="tab === 'active' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500'">
+                    {{ tournaments|filter(t => t.active)|length }}
+                </span>
+            </button>
+            <button @click="tab = 'inactive'"
+                    :class="tab === 'inactive' ? 'border-b-2 border-gray-900 text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+                    class="px-4 py-2.5 text-sm font-medium transition-colors -mb-px">
+                Inactivos
+                <span class="ml-1.5 rounded-full px-1.5 py-0.5 text-xs"
+                      :class="tab === 'inactive' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500'">
+                    {{ tournaments|filter(t => not t.active)|length }}
+                </span>
+            </button>
+        </div>
 
-            {# Vista Escritorio: Tabla #}
-            <div class="hidden md:block">
-                <table class="min-w-full divide-y divide-white/5">
-                    <thead class="bg-white/[0.02]">
-                    <tr>
-                        <th class="px-8 py-6 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Nombre Competición</th>
-                        <th class="px-6 py-6 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Formato</th>
-                        <th class="px-6 py-6 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Estado</th>
-                        <th class="px-8 py-6 text-right text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Operaciones</th>
-                    </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5">
-                    {% for tournament in tournaments %}
-                        <tr class="hover:bg-white/[0.02] transition-colors group">
-                            <td class="px-8 py-6">
-                                <span class="text-sm font-black text-[#e2d9c2] uppercase tracking-tight italic group-hover:text-white transition-colors">{{ tournament.name }}</span>
-                            </td>
-                            <td class="px-6 py-6">
-                                <span class="px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg border {{ tournament.type == 'LEAGUE' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border-purple-500/20' }}">
-                                    {{ tournament.type == 'LEAGUE' ? 'Liga' : 'Torneo' }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-6">
-                                {% if tournament.active %}
-                                    <span class="inline-flex items-center text-[9px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
-                                        <span class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-2 animate-pulse"></span> ONLINE
-                                    </span>
-                                {% else %}
-                                    <span class="inline-flex items-center text-[9px] font-black uppercase tracking-widest text-[#e63946] bg-[#e63946]/10 px-3 py-1.5 rounded-lg border border-[#e63946]/20">
-                                        <span class="h-1.5 w-1.5 bg-[#e63946] rounded-full mr-2"></span> OFF
-                                    </span>
-                                {% endif %}
-                            </td>
-                            <td class="px-8 py-6 text-right space-x-3">
-                                <a href="{{ path('app_admin_game_index', {'id': tournament.id}) }}" class="inline-flex items-center px-5 py-2.5 bg-white/5 text-[#e2d9c2] text-[10px] font-black rounded-xl hover:bg-[#e63946] hover:text-white transition-all uppercase tracking-widest border border-white/10 shadow-lg">
-                                    GESTIONAR
-                                </a>
-                                <a href="{{ path('app_admin_tournament_edit', {'id': tournament.id}) }}" class="inline-flex items-center px-4 py-2.5 bg-white/5 text-gray-500 text-[10px] font-black rounded-xl hover:text-white hover:bg-white/10 transition-all uppercase tracking-widest">
-                                    EDITAR
-                                </a>
-                                <form method="post" action="{{ path('app_admin_tournament_delete', {'id': tournament.id}) }}" onsubmit="return confirm('¿Confirmar borrado? Esta acción es irreversible.');" class="inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tournament.id) }}">
-                                    <button class="p-2.5 text-gray-700 hover:text-[#e63946] transition-colors">
-                                        <i class="fas fa-trash-alt text-sm"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        {# Tabla #}
+        <div class="rounded-xl border border-gray-200 bg-white overflow-hidden">
 
-            {# Vista Móvil: Cards RXUP #}
-            <div class="md:hidden divide-y divide-white/5">
-                {% for tournament in tournaments %}
-                    <div class="p-8 space-y-6">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] mb-1">Competición</p>
-                                <h3 class="text-xl font-black text-[#e2d9c2] uppercase tracking-tighter italic">{{ tournament.name }}</h3>
-                            </div>
-                            <span class="px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg border {{ tournament.type == 'LEAGUE' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border-purple-500/20' }}">
-                                {{ tournament.type == 'LEAGUE' ? 'Liga' : 'Torneo' }}
-                            </span>
-                        </div>
-
-                        <div class="flex justify-between items-center bg-white/[0.02] p-5 rounded-3xl border border-white/5">
-                            <div class="flex flex-col">
-                                <span class="text-[9px] font-black text-gray-600 uppercase tracking-widest mb-1">Status</span>
-                                <span class="text-xs font-black uppercase {{ tournament.active ? 'text-emerald-500' : 'text-[#e63946]' }}">
-                                    {{ tournament.active ? '✓ ONLINE' : '✗ OFF' }}
-                                </span>
-                            </div>
-                            <div class="flex gap-3">
-                                <a href="{{ path('app_admin_tournament_edit', {'id': tournament.id}) }}" class="w-12 h-12 flex items-center justify-center bg-[#252525] text-gray-500 rounded-2xl border border-white/5 active:scale-95 transition-transform">
-                                    <i class="fas fa-edit text-sm"></i>
-                                </a>
-                                <form method="post" action="{{ path('app_admin_tournament_delete', {'id': tournament.id}) }}" onsubmit="return confirm('¿Borrar?');" class="inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tournament.id) }}">
-                                    <button class="w-12 h-12 flex items-center justify-center bg-[#252525] text-[#e63946] rounded-2xl border border-[#e63946]/10 active:scale-95 transition-transform">
-                                        <i class="fas fa-trash-alt text-sm"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <a href="{{ path('app_admin_game_index', {'id': tournament.id}) }}" class="w-full inline-flex items-center justify-center px-6 py-5 bg-[#e63946] text-white text-[11px] font-black rounded-2xl shadow-xl shadow-[#e63946]/10 uppercase tracking-[0.2em] italic">
-                            GESTIONAR CALENDARIO <i class="fas fa-calendar-alt ml-2"></i>
-                        </a>
+            {# --- ACTIVOS --- #}
+            <div x-show="tab === 'active'">
+                {% set active = tournaments|filter(t => t.active) %}
+                {% if active|length == 0 %}
+                    <div class="flex flex-col items-center justify-center py-16 text-center">
+                        <i class="fa-solid fa-trophy text-3xl text-gray-300 mb-3"></i>
+                        <p class="text-sm font-medium text-gray-500">No hay torneos activos</p>
                     </div>
                 {% else %}
-                    <div class="p-20 text-center">
-                        <i class="fas fa-folder-open text-4xl text-gray-800 mb-4 block"></i>
-                        <p class="text-gray-600 uppercase text-[10px] font-black tracking-widest">Base de datos vacía</p>
-                    </div>
-                {% endfor %}
+                    <table class="min-w-full divide-y divide-gray-100">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Formato</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            {% for tournament in active %}
+                                {{ _self.tournament_row(tournament) }}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
             </div>
+
+            {# --- INACTIVOS --- #}
+            <div x-show="tab === 'inactive'" x-cloak>
+                {% set inactive = tournaments|filter(t => not t.active) %}
+                {% if inactive|length == 0 %}
+                    <div class="flex flex-col items-center justify-center py-16 text-center">
+                        <i class="fa-solid fa-archive text-3xl text-gray-300 mb-3"></i>
+                        <p class="text-sm font-medium text-gray-500">No hay torneos inactivos</p>
+                    </div>
+                {% else %}
+                    <table class="min-w-full divide-y divide-gray-100">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Formato</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            {% for tournament in inactive %}
+                                {{ _self.tournament_row(tournament) }}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+
         </div>
     </div>
+
+    {# Macro fila de torneo #}
+    {% macro tournament_row(tournament) %}
+        <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4">
+                <span class="text-sm font-medium {{ tournament.active ? 'text-gray-900' : 'text-gray-400' }}">{{ tournament.name }}</span>
+            </td>
+            <td class="px-6 py-4">
+                <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium
+                             {{ tournament.type == 'LEAGUE' ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-600/20' : 'bg-purple-50 text-purple-700 ring-1 ring-purple-600/20' }}">
+                    {{ tournament.type == 'LEAGUE' ? 'Liga' : 'Torneo' }}
+                </span>
+            </td>
+            <td class="px-6 py-4">
+                <form method="post" action="{{ path('app_admin_tournament_toggle_active', {'id': tournament.id}) }}" class="inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ tournament.id) }}">
+                    <button type="submit"
+                            class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border transition-colors
+                                   {{ tournament.active
+                                       ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                       : 'bg-gray-100 text-gray-400 border-gray-200 hover:bg-gray-200' }}"
+                            title="{{ tournament.active ? 'Marcar como inactivo' : 'Marcar como activo' }}">
+                        <span class="h-1.5 w-1.5 rounded-full {{ tournament.active ? 'bg-emerald-500' : 'bg-gray-400' }}"></span>
+                        {{ tournament.active ? 'Activo' : 'Inactivo' }}
+                    </button>
+                </form>
+            </td>
+            <td class="px-6 py-4 text-right">
+                <div class="flex items-center justify-end gap-2">
+                    <a href="{{ path('app_admin_game_index', {'id': tournament.id}) }}"
+                       class="rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-700 transition-colors">
+                        Gestionar
+                    </a>
+                    <a href="{{ path('app_admin_tournament_teams', {'id': tournament.id}) }}"
+                       class="rounded-md border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                        Parejas
+                    </a>
+                    <a href="{{ path('app_admin_tournament_edit', {'id': tournament.id}) }}"
+                       class="rounded-md border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                        Editar
+                    </a>
+                    <form method="post" action="{{ path('app_admin_tournament_delete', {'id': tournament.id}) }}"
+                          onsubmit="return confirm('¿Eliminar este torneo? Esta acción no se puede deshacer.');" class="inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tournament.id) }}">
+                        <button type="submit"
+                                class="rounded-md border border-gray-200 p-1.5 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors">
+                            <i class="fa-solid fa-trash-alt text-xs"></i>
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    {% endmacro %}
 {% endblock %}

@@ -1,100 +1,63 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Perfil: {{ user.name }} - RXUP{% endblock %}
+{% block title %}{{ user.name }} — RXUP Admin{% endblock %}
+{% block page_title_mobile %}{{ user.name }}{% endblock %}
 
 {% block body %}
-    <div class="max-w-3xl mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl mx-auto">
 
-        {# Botón Volver Estilo RXUP #}
-        <div class="mb-10">
-            <a href="{{ path('app_user_index') }}" class="group inline-flex items-center text-[10px] font-black text-gray-500 hover:text-[#e63946] transition-colors uppercase tracking-[0.3em]">
-                <i class="fas fa-chevron-left mr-2 transform group-hover:-translate-x-2 transition-transform"></i>
-                Base de Jugadores
+        {# Volver #}
+        <div class="mb-6">
+            <a href="{{ path('app_user_index') }}"
+               class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-2">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+                Volver a jugadores
             </a>
+            <h1 class="text-xl font-semibold text-gray-900">Perfil del jugador</h1>
         </div>
 
-        <div class="bg-[#1a1a1a] shadow-[0_40px_80px_rgba(0,0,0,0.6)] rounded-[3.5rem] overflow-hidden border border-white/5 relative">
+        <div class="rounded-xl border border-gray-200 bg-white overflow-hidden">
 
-            {# Cabecera de Perfil Industrial #}
-            <div class="bg-[#0f0f0f] px-8 py-14 text-center relative overflow-hidden border-b border-white/5">
-                {# Decoración de fondo (Rayo RXUP) #}
-                <div class="absolute -right-10 -top-10 opacity-[0.03] rotate-12">
-                    <i class="fas fa-bolt text-white text-[15rem]"></i>
+            {# Cabecera #}
+            <div class="flex items-center gap-4 px-6 py-5 border-b border-gray-100">
+                <div class="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600 shrink-0">
+                    {{ user.name|slice(0,2)|upper }}
                 </div>
-
-                <div class="relative z-10">
-                    {# Avatar Estilo Badge #}
-                    <div class="inline-flex items-center justify-center h-28 w-28 rounded-[2.5rem] bg-[#252525] text-[#e63946] text-4xl font-black shadow-[0_20px_40px_rgba(0,0,0,0.5)] mb-6 border-4 border-[#1a1a1a] italic">
-                        {{ user.name|slice(0, 2)|upper }}
-                    </div>
-
-                    <h1 class="text-4xl font-black text-[#e2d9c2] uppercase tracking-tighter italic leading-none">{{ user.name }}</h1>
-
-                    <div class="mt-4 flex justify-center">
-                        {% if 'ROLE_ADMIN' in user.roles %}
-                            <span class="px-4 py-1.5 text-[9px] font-black bg-[#e63946] text-white rounded-xl uppercase tracking-[0.3em] shadow-lg shadow-[#e63946]/20 italic">Master Admin</span>
-                        {% else %}
-                            <span class="px-4 py-1.5 text-[9px] font-black bg-[#252525] text-[#e2d9c2] rounded-xl uppercase tracking-[0.3em] border border-white/10 shadow-lg italic">Jugador Oficial</span>
-                        {% endif %}
-                    </div>
+                <div>
+                    <h2 class="text-base font-semibold text-gray-900">{{ user.name }}</h2>
+                    {% if 'ROLE_ADMIN' in user.roles %}
+                        <span class="inline-flex items-center rounded-md bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700 ring-1 ring-red-600/20">Admin</span>
+                    {% else %}
+                        <span class="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">Jugador</span>
+                    {% endif %}
                 </div>
             </div>
 
-            {# Información Técnica #}
-            <div class="p-10 md:p-14 space-y-12">
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    {# Columna Email #}
-                    <div class="flex items-start gap-5 group">
-                        <div class="h-12 w-12 rounded-2xl bg-[#252525] flex items-center justify-center text-gray-600 group-hover:text-[#e63946] transition-colors border border-white/5 shadow-inner">
-                            <i class="fas fa-envelope text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-1">Email de Acceso</p>
-                            <p class="text-sm font-black text-[#e2d9c2] uppercase tracking-tight">{{ user.email }}</p>
-                        </div>
-                    </div>
-
-                    {# Columna Teléfono #}
-                    <div class="flex items-start gap-5 group">
-                        <div class="h-12 w-12 rounded-2xl bg-[#252525] flex items-center justify-center text-gray-600 group-hover:text-[#e63946] transition-colors border border-white/5 shadow-inner">
-                            <i class="fas fa-phone text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-1">Contacto Directo</p>
-                            <p class="text-sm font-black text-[#e2d9c2] uppercase tracking-tight">{{ user.phone ?? 'SIN REGISTRO' }}</p>
-                        </div>
-                    </div>
+            {# Datos #}
+            <dl class="divide-y divide-gray-100">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <dt class="text-sm font-medium text-gray-500">Email</dt>
+                    <dd class="text-sm text-gray-900">{{ user.email }}</dd>
                 </div>
-
-                {# Stats de Sistema #}
-                <div class="pt-10 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-10">
-                    {# ID #}
-                    <div class="bg-[#252525]/30 p-5 rounded-3xl border border-white/5 shadow-inner">
-                        <p class="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] mb-2">Member ID</p>
-                        <code class="text-xs font-mono font-black text-[#e63946]">#{{ user.id|upper }}</code>
-                    </div>
-                    {# Estado #}
-                    <div class="bg-[#252525]/30 p-5 rounded-3xl border border-white/5 shadow-inner">
-                        <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">Status Arena</p>
-                        <span class="text-xs font-black text-emerald-500 flex items-center uppercase italic">
-                            <span class="h-2 w-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span> Sistema Activo
-                        </span>
-                    </div>
+                <div class="flex items-center justify-between px-6 py-4">
+                    <dt class="text-sm font-medium text-gray-500">Teléfono</dt>
+                    <dd class="text-sm text-gray-900">{{ user.phone ?? '—' }}</dd>
                 </div>
-
-                {# Acciones de Admin #}
-                <div class="pt-10 flex flex-col md:flex-row gap-5">
-                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="flex-1 inline-flex items-center justify-center bg-[#e2d9c2] text-[#0f0f0f] text-xs font-black py-5 px-8 rounded-[2rem] hover:bg-white transition-all uppercase tracking-[0.2em] shadow-xl italic group">
-                        <i class="fas fa-user-edit mr-3 text-[#e63946] group-hover:scale-110 transition-transform"></i> Editar Jugador
-                    </a>
-
-                    <div class="md:w-max group">
-                        {# El include del delete_form mantendrá su estilo, pero lo envolvemos si es necesario #}
-                        {{ include('user/_delete_form.html.twig') }}
-                    </div>
+                <div class="flex items-center justify-between px-6 py-4">
+                    <dt class="text-sm font-medium text-gray-500">ID</dt>
+                    <dd class="text-xs font-mono text-gray-400">#{{ user.id }}</dd>
                 </div>
+            </dl>
+
+            {# Acciones #}
+            <div class="flex items-center gap-3 px-6 py-4 border-t border-gray-100">
+                <a href="{{ path('app_user_edit', {'id': user.id}) }}"
+                   class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors">
+                    Editar
+                </a>
+                {{ include('user/_delete_form.html.twig') }}
             </div>
+
         </div>
     </div>
 {% endblock %}

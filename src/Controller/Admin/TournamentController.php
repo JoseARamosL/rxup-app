@@ -67,6 +67,20 @@ class TournamentController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/toggle-active', name: 'app_admin_tournament_toggle_active', methods: ['POST'])]
+    public function toggleActive(Request $request, Tournament $tournament, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('toggle'.$tournament->getId(), $request->request->get('_token'))) {
+            $tournament->setActive(!$tournament->isActive());
+            $entityManager->flush();
+
+            $state = $tournament->isActive() ? 'activado' : 'desactivado';
+            $this->addFlash('success', "Torneo {$state} correctamente.");
+        }
+
+        return $this->redirectToRoute('app_admin_tournament_index');
+    }
+
     #[Route('/{id}/delete', name: 'app_admin_tournament_delete', methods: ['POST'])]
     public function delete(Request $request, Tournament $tournament, EntityManagerInterface $entityManager): Response
     {

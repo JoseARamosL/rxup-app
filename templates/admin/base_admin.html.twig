@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}RXUP Admin{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="h-full" x-data="{ sidebarOpen: false }">
+
+<div class="flex h-full min-h-screen">
+
+    {# Overlay móvil #}
+    <div x-show="sidebarOpen"
+         x-cloak
+         @click="sidebarOpen = false"
+         class="fixed inset-0 z-20 bg-black/30 md:hidden"></div>
+
+    {# Sidebar #}
+    <aside class="fixed inset-y-0 left-0 z-30 flex w-60 flex-col bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out
+                  -translate-x-full md:translate-x-0"
+           :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
+
+        {# Logo #}
+        <div class="flex h-16 shrink-0 items-center px-6 border-b border-gray-100">
+            <span class="text-lg font-bold text-gray-900 tracking-tight">RXUP</span>
+            <span class="ml-2 text-xs font-medium text-gray-400 uppercase tracking-widest">Admin</span>
+        </div>
+
+        {# Navegación #}
+        <nav class="flex flex-1 flex-col gap-1 px-3 py-4 overflow-y-auto">
+            <p class="px-3 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Gestión</p>
+
+            <a href="{{ path('app_admin_tournament_index') }}"
+               class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors
+                      {{ app.request.get('_route') starts with 'app_admin_tournament' or app.request.get('_route') starts with 'app_admin_game' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                <i class="fa-solid fa-trophy w-4 text-center {{ app.request.get('_route') starts with 'app_admin_tournament' or app.request.get('_route') starts with 'app_admin_game' ? 'text-gray-700' : 'text-gray-400' }}"></i>
+                Torneos
+            </a>
+
+            <a href="{{ path('app_user_index') }}"
+               class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors
+                      {{ app.request.get('_route') starts with 'app_user' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                <i class="fa-solid fa-users w-4 text-center {{ app.request.get('_route') starts with 'app_user' ? 'text-gray-700' : 'text-gray-400' }}"></i>
+                Jugadores
+            </a>
+
+            <div class="my-3 border-t border-gray-100"></div>
+            <p class="px-3 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">App</p>
+
+            <a href="{{ path('app_tournament_index') }}"
+               class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                <i class="fa-solid fa-arrow-up-right-from-square w-4 text-center text-gray-400"></i>
+                Ver App
+            </a>
+        </nav>
+
+        {# Usuario #}
+        <div class="shrink-0 border-t border-gray-100 px-4 py-4">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-user text-xs text-gray-500"></i>
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <span class="text-xs font-semibold text-gray-900 truncate">{{ app.user.name }}</span>
+                    <span class="text-[10px] text-gray-400">Administrador</span>
+                </div>
+                <a href="{{ path('app_logout') }}" title="Cerrar sesión"
+                   class="ml-auto text-gray-400 hover:text-gray-600 transition-colors shrink-0">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    {# Contenido principal #}
+    <div class="flex flex-1 flex-col md:pl-60">
+
+        {# Topbar móvil #}
+        <div class="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-gray-200 bg-white px-4 md:hidden">
+            <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 hover:text-gray-700">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+            <span class="text-sm font-semibold text-gray-900">{% block page_title_mobile %}RXUP Admin{% endblock %}</span>
+        </div>
+
+        {# Mensajes flash #}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="mx-6 mt-4">
+                    <div class="flex items-center gap-3 rounded-lg border px-4 py-3 text-sm
+                                {% if label == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-700{% else %}bg-red-50 border-red-200 text-red-700{% endif %}">
+                        <i class="fa-solid {% if label == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <main class="flex-1 px-6 py-6">
+            {% block body %}{% endblock %}
+        </main>
+    </div>
+
+</div>
+
+{% block javascripts %}
+    <script src="https://unpkg.com/@alpinejs/collapse@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+{% endblock %}
+</body>
+</html>
