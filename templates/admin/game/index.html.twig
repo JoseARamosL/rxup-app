@@ -29,6 +29,13 @@
                 <p class="text-sm text-gray-500 mt-0.5">Gestión de partidos</p>
             </div>
             <div class="flex items-center gap-2">
+                {% if tournament.type == 'LEAGUE' %}
+                    <a href="{{ path('app_admin_availability_index', {id: tournament.id}) }}"
+                       class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                        <i class="fa-solid fa-calendar-check text-xs text-blue-500"></i>
+                        Disponibilidades
+                    </a>
+                {% endif %}
                 {% if tournament.hasRanking %}
                     <a href="{{ path('app_admin_tournament_ranking', {id: tournament.id}) }}"
                        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">

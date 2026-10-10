@@ -1,0 +1,130 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Disponibilidades — {{ tournament.name }}{% endblock %}
+{% block page_title_mobile %}Disponibilidades{% endblock %}
+
+{% block body %}
+<div class="max-w-5xl mx-auto">
+
+    {# Cabecera #}
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <a href="{{ path('app_admin_game_index', {id: tournament.id}) }}"
+               class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-1">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+                Volver a partidos
+            </a>
+            <h1 class="text-xl font-semibold text-gray-900">Disponibilidades</h1>
+            <p class="text-sm text-gray-500 mt-0.5">{{ tournament.name }}</p>
+        </div>
+        <a href="{{ path('app_admin_availability_cross', {id: tournament.id}) }}"
+           class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors">
+            <i class="fa-solid fa-shuffle text-xs"></i>
+            Cruzar partidos
+        </a>
+    </div>
+
+    {% if teams is empty %}
+        <div class="rounded-xl border border-gray-200 bg-white flex flex-col items-center justify-center py-16 text-center">
+            <i class="fa-solid fa-users text-3xl text-gray-300 mb-3"></i>
+            <p class="text-sm text-gray-500">No hay parejas inscritas en esta liga</p>
+        </div>
+    {% else %}
+        <div class="space-y-4">
+            {% for team in teams %}
+                <div class="rounded-xl border border-gray-200 bg-white overflow-hidden"
+                     x-data="{ open: false }">
+
+                    {# Cabecera pareja #}
+                    <button @click="open = !open"
+                            class="flex w-full items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="flex -space-x-1.5">
+                                <div class="h-7 w-7 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-white text-[10px] font-semibold">
+                                    {{ team.player1.name|slice(0,1)|upper }}
+                                </div>
+                                <div class="h-7 w-7 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[10px] font-semibold">
+                                    {{ team.player2.name|slice(0,1)|upper }}
+                                </div>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-sm font-medium text-gray-900">{{ team.player1.name }} / {{ team.player2.name }}</p>
+                                <p class="text-xs text-gray-400">
+                                    {% set total = 0 %}
+                                    {% for date, avails in availsByTeam[team.id]|default([]) %}
+                                        {% set total = total + avails|length %}
+                                    {% endfor %}
+                                    {{ total }} hueco{{ total != 1 ? 's' : '' }} esta semana
+                                </p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform duration-200"
+                           :class="open ? 'rotate-180' : ''"></i>
+                    </button>
+
+                    {# Contenido #}
+                    <div x-show="open" x-collapse class="border-t border-gray-100">
+                        <div class="p-5 space-y-4">
+
+                            {# Slots existentes #}
+                            {% set teamAvails = availsByTeam[team.id]|default([]) %}
+                            {% if teamAvails is empty %}
+                                <p class="text-sm text-gray-400 italic">Sin disponibilidad introducida</p>
+                            {% else %}
+                                <div class="space-y-3">
+                                    {% for dateStr, avails in teamAvails %}
+                                        <div>
+                                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                                                {{ avails[0].date|date('D d/m/Y') }}
+                                            </p>
+                                            <div class="flex flex-wrap gap-2">
+                                                {% for avail in avails %}
+                                                    <div class="inline-flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700">
+                                                        {{ avail.startTime|date('H:i') }}
+                                                        <form method="post"
+                                                              action="{{ path('app_admin_availability_delete', {id: tournament.id, availId: avail.id}) }}"
+                                                              class="inline">
+                                                            <button type="submit"
+                                                                    class="text-gray-400 hover:text-red-500 transition-colors ml-0.5"
+                                                                    onclick="return confirm('¿Eliminar este hueco?')">
+                                                                <i class="fa-solid fa-xmark text-xs"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {# Formulario añadir hueco #}
+                            <form method="post"
+                                  action="{{ path('app_admin_availability_add', {id: tournament.id}) }}"
+                                  class="flex flex-wrap items-end gap-3 pt-3 border-t border-gray-100">
+                                <input type="hidden" name="team_id" value="{{ team.id }}">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Fecha</label>
+                                    <input type="date" name="date" required
+                                           class="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Hora de inicio</label>
+                                    <input type="time" name="start_time" required step="1800"
+                                           class="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900">
+                                </div>
+                                <button type="submit"
+                                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                                    <i class="fa-solid fa-plus text-xs"></i>
+                                    Añadir hueco
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
