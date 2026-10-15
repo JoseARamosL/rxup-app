@@ -106,7 +106,7 @@ class SeedAvailabilityCommand extends Command
         $this->em->flush();
         $io->success('10 parejas creadas.');
 
-        // --- Disponibilidades (semana 2026-10-12 al 2026-10-18) ---
+        // --- Disponibilidades (semana 2026-10-12 al 2026-10-18) como rangos ---
         // Lunes=12, Martes=13, Miércoles=14, Jueves=15, Viernes=16, Sábado=17, Domingo=18
         $mon = '2026-10-12';
         $tue = '2026-10-13';
@@ -116,35 +116,35 @@ class SeedAvailabilityCommand extends Command
         $sat = '2026-10-17';
         $sun = '2026-10-18';
 
-        // P1 (Sergio/Marta): Lun 18, Mié 19, Vie 17
-        $this->addSlots($teams[0], $liga, [[$mon,'18:00'], [$wed,'19:00'], [$fri,'17:00']]);
+        // P1 (Sergio/Marta):   Lun 17-20, Mié 18-21, Vie 16-19
+        $this->addRanges($teams[0], $liga, [[$mon,'17:00','20:00'], [$wed,'18:00','21:00'], [$fri,'16:00','19:00']]);
 
-        // P2 (Raúl/Sofía): Lun 18, Jue 20
-        $this->addSlots($teams[1], $liga, [[$mon,'18:00'], [$thu,'20:00']]);
+        // P2 (Raúl/Sofía):     Lun 17-20, Jue 19-21
+        $this->addRanges($teams[1], $liga, [[$mon,'17:00','20:00'], [$thu,'19:00','21:00']]);
 
-        // P3 (Álvaro/Elena): Mié 19, Vie 17, Sáb 10
-        $this->addSlots($teams[2], $liga, [[$wed,'19:00'], [$fri,'17:00'], [$sat,'10:00']]);
+        // P3 (Álvaro/Elena):   Mié 18-21, Vie 16-19, Sáb 09-12
+        $this->addRanges($teams[2], $liga, [[$wed,'18:00','21:00'], [$fri,'16:00','19:00'], [$sat,'09:00','12:00']]);
 
-        // P4 (Marcos/Cristina): Lun 18, Mié 19
-        $this->addSlots($teams[3], $liga, [[$mon,'18:00'], [$wed,'19:00']]);
+        // P4 (Marcos/Cristina): Lun 17-20, Mié 18-21
+        $this->addRanges($teams[3], $liga, [[$mon,'17:00','20:00'], [$wed,'18:00','21:00']]);
 
-        // P5 (Rubén/Patricia): Jue 20, Vie 17
-        $this->addSlots($teams[4], $liga, [[$thu,'20:00'], [$fri,'17:00']]);
+        // P5 (Rubén/Patricia): Jue 19-21, Vie 16-19
+        $this->addRanges($teams[4], $liga, [[$thu,'19:00','21:00'], [$fri,'16:00','19:00']]);
 
-        // P6 (Diego/Natalia): Sáb 10, Dom 11
-        $this->addSlots($teams[5], $liga, [[$sat,'10:00'], [$sun,'11:00']]);
+        // P6 (Diego/Natalia):  Sáb 09-12, Dom 10-13
+        $this->addRanges($teams[5], $liga, [[$sat,'09:00','12:00'], [$sun,'10:00','13:00']]);
 
-        // P7 (Iván/Claudia): Lun 18, Vie 17
-        $this->addSlots($teams[6], $liga, [[$mon,'18:00'], [$fri,'17:00']]);
+        // P7 (Iván/Claudia):   Lun 17-20, Vie 16-19
+        $this->addRanges($teams[6], $liga, [[$mon,'17:00','20:00'], [$fri,'16:00','19:00']]);
 
-        // P8 (Adrián/Sandra): Mié 19, Sáb 10
-        $this->addSlots($teams[7], $liga, [[$wed,'19:00'], [$sat,'10:00']]);
+        // P8 (Adrián/Sandra):  Mié 18-21, Sáb 09-12
+        $this->addRanges($teams[7], $liga, [[$wed,'18:00','21:00'], [$sat,'09:00','12:00']]);
 
-        // P9 (Borja/Verónica): Dom 09 ← SOLO este hueco, nadie más tiene Dom 09
-        $this->addSlots($teams[8], $liga, [[$sun,'09:00']]);
+        // P9 (Borja/Verónica):  Dom 07-09 ← no coincide con P6 Dom 10-13
+        $this->addRanges($teams[8], $liga, [[$sun,'07:00','09:00']]);
 
-        // P10 (Guillermo/Laura): Mar 21 ← SOLO este hueco, nadie más tiene Mar 21
-        $this->addSlots($teams[9], $liga, [[$tue,'21:00']]);
+        // P10 (Guillermo/Laura): Mar 21-23 ← nadie más tiene disponibilidad en martes
+        $this->addRanges($teams[9], $liga, [[$tue,'21:00','23:00']]);
 
         $this->em->flush();
         $io->success('Disponibilidades creadas.');
@@ -153,14 +153,15 @@ class SeedAvailabilityCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function addSlots(Team $team, Tournament $tournament, array $slots): void
+    private function addRanges(Team $team, Tournament $tournament, array $ranges): void
     {
-        foreach ($slots as [$dateStr, $timeStr]) {
+        foreach ($ranges as [$dateStr, $startStr, $endStr]) {
             $a = new Availability();
             $a->setTeam($team)
               ->setTournament($tournament)
               ->setDate(\DateTime::createFromFormat('Y-m-d', $dateStr))
-              ->setStartTime(\DateTime::createFromFormat('H:i', $timeStr));
+              ->setStartTime(\DateTime::createFromFormat('H:i', $startStr))
+              ->setEndTime(\DateTime::createFromFormat('H:i', $endStr));
             $this->em->persist($a);
         }
     }

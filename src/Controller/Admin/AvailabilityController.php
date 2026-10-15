@@ -26,7 +26,6 @@ class AvailabilityController extends AbstractController
     ): Response {
         $teams = $teamRepository->findBy(['tournament' => $tournament]);
 
-        // Agrupar disponibilidades por equipo y luego por fecha
         $availsByTeam = [];
         foreach ($teams as $team) {
             $avails = $availabilityRepository->findBy(
@@ -55,25 +54,37 @@ class AvailabilityController extends AbstractController
         TeamRepository $teamRepository,
         AvailabilityRepository $availabilityRepository
     ): Response {
-        $teamId    = $request->request->get('team_id');
-        $dateStr   = $request->request->get('date');
-        $timeStr   = $request->request->get('start_time');
+        $teamId      = $request->request->get('team_id');
+        $dateStr     = $request->request->get('date');
+        $startStr    = $request->request->get('start_time');
+        $endStr      = $request->request->get('end_time');
 
         $team = $teamRepository->find($teamId);
-        if (!$team || !$dateStr || !$timeStr) {
+        if (!$team || !$dateStr || !$startStr || !$endStr) {
             $this->addFlash('error', 'Datos incompletos.');
             return $this->redirectToRoute('app_admin_availability_index', ['id' => $tournament->getId()]);
         }
 
         $date      = \DateTime::createFromFormat('Y-m-d', $dateStr);
-        $startTime = \DateTime::createFromFormat('H:i', $timeStr);
+        $startTime = \DateTime::createFromFormat('H:i', $startStr);
+        $endTime   = \DateTime::createFromFormat('H:i', $endStr);
 
-        // Evitar duplicados
+        if (!$date || !$startTime || !$endTime) {
+            $this->addFlash('error', 'Formato de fecha u hora incorrecto.');
+            return $this->redirectToRoute('app_admin_availability_index', ['id' => $tournament->getId()]);
+        }
+
+        if ($endTime <= $startTime) {
+            $this->addFlash('error', 'La hora de fin debe ser posterior a la de inicio.');
+            return $this->redirectToRoute('app_admin_availability_index', ['id' => $tournament->getId()]);
+        }
+
+        // Evitar duplicados exactos
         $existing = $availabilityRepository->findOneBy([
-            'team'      => $team,
-            'tournament'=> $tournament,
-            'date'      => $date,
-            'startTime' => $startTime,
+            'team'       => $team,
+            'tournament' => $tournament,
+            'date'       => $date,
+            'startTime'  => $startTime,
         ]);
 
         if (!$existing) {
@@ -81,7 +92,8 @@ class AvailabilityController extends AbstractController
             $avail->setTeam($team)
                   ->setTournament($tournament)
                   ->setDate($date)
-                  ->setStartTime($startTime);
+                  ->setStartTime($startTime)
+                  ->setEndTime($endTime);
             $em->persist($avail);
             $em->flush();
         }
@@ -114,19 +126,23 @@ class AvailabilityController extends AbstractController
     ): Response {
         $teams = $teamRepository->findBy(['tournament' => $tournament]);
 
-        // Cargar todas las disponibilidades indexadas por team_id → [date+time, ...]
-        $slots = []; // [teamId => ['2025-01-13 17:00', ...]]
+        // Cargar disponibilidades indexadas por equipo → fecha → lista de rangos (minutos)
+        $slots = []; // [teamId][dateKey] => [['start' => int, 'end' => int], ...]
         foreach ($teams as $team) {
             $avails = $availabilityRepository->findBy(['team' => $team, 'tournament' => $tournament]);
             foreach ($avails as $a) {
-                $key = $a->getDate()->format('Y-m-d') . ' ' . $a->getStartTime()->format('H:i');
-                $slots[$team->getId()][] = $key;
+                $dateKey = $a->getDate()->format('Y-m-d');
+                $s = (int)$a->getStartTime()->format('H') * 60 + (int)$a->getStartTime()->format('i');
+                $e = $a->getEndTime()
+                    ? (int)$a->getEndTime()->format('H') * 60 + (int)$a->getEndTime()->format('i')
+                    : $s;
+                $slots[$team->getId()][$dateKey][] = ['start' => $s, 'end' => $e];
             }
         }
 
-        // Partidos ya jugados o programados (para no repetir)
-        $playedPairs = [];
-        $teamsWithGame = [];
+        // Partidos ya programados
+        $playedPairs    = [];
+        $teamsWithGame  = [];
         $games = $gameRepository->findBy(['tournament' => $tournament]);
         foreach ($games as $game) {
             if ($game->getTeam1() && $game->getTeam2()) {
@@ -138,7 +154,7 @@ class AvailabilityController extends AbstractController
             }
         }
 
-        // Cruce: para cada par de equipos que no hayan jugado, buscar slots comunes
+        // Cruce: para cada par sin partido, buscar horas de inicio válidas dentro del solapamiento
         $suggestions = [];
         $teamsArr = array_values($teams);
         for ($i = 0; $i < count($teamsArr); $i++) {
@@ -153,22 +169,42 @@ class AvailabilityController extends AbstractController
 
                 $s1 = $slots[$t1->getId()] ?? [];
                 $s2 = $slots[$t2->getId()] ?? [];
-                $common = array_intersect($s1, $s2);
+
+                // Fechas que ambos equipos tienen disponibilidad
+                $commonDates = array_keys(array_intersect_key($s1, $s2));
+
+                $common = [];
+                foreach ($commonDates as $dateKey) {
+                    foreach ($s1[$dateKey] as $r1) {
+                        foreach ($s2[$dateKey] as $r2) {
+                            $overlapStart = max($r1['start'], $r2['start']);
+                            $overlapEnd   = min($r1['end'],   $r2['end']);
+                            if ($overlapStart <= $overlapEnd) {
+                                // Generar huecos cada 30 min dentro del solapamiento
+                                for ($t = $overlapStart; $t <= $overlapEnd; $t += 30) {
+                                    $h = intdiv($t, 60);
+                                    $m = $t % 60;
+                                    $common[] = $dateKey . ' ' . sprintf('%02d:%02d', $h, $m);
+                                }
+                            }
+                        }
+                    }
+                }
 
                 if (!empty($common)) {
+                    sort($common);
                     $suggestions[] = [
-                        'team1'  => $t1,
-                        'team2'  => $t2,
-                        'slots'  => array_values($common),
+                        'team1' => $t1,
+                        'team2' => $t2,
+                        'slots' => array_values(array_unique($common)),
                     ];
                 }
             }
         }
 
-        // Ordenar sugerencias por fecha del primer slot disponible
         usort($suggestions, fn($a, $b) => $a['slots'][0] <=> $b['slots'][0]);
 
-        // Detectar parejas con disponibilidad pero sin ningún cruce posible
+        // Parejas con disponibilidad pero sin ningún cruce posible
         $teamsInSuggestions = [];
         foreach ($suggestions as $s) {
             $teamsInSuggestions[$s['team1']->getId()] = true;
@@ -177,8 +213,8 @@ class AvailabilityController extends AbstractController
 
         $strandedTeams = [];
         foreach ($teams as $team) {
-            $hasSlots = !empty($slots[$team->getId()]);
-            $inSuggestion = isset($teamsInSuggestions[$team->getId()]);
+            $hasSlots        = !empty($slots[$team->getId()]);
+            $inSuggestion    = isset($teamsInSuggestions[$team->getId()]);
             $alreadyScheduled = isset($teamsWithGame[$team->getId()]);
             if ($hasSlots && !$inSuggestion && !$alreadyScheduled) {
                 $strandedTeams[] = $team;
@@ -186,9 +222,9 @@ class AvailabilityController extends AbstractController
         }
 
         return $this->render('admin/availability/cross.html.twig', [
-            'tournament'   => $tournament,
-            'suggestions'  => $suggestions,
-            'strandedTeams'=> $strandedTeams,
+            'tournament'    => $tournament,
+            'suggestions'   => $suggestions,
+            'strandedTeams' => $strandedTeams,
         ]);
     }
 
@@ -199,11 +235,11 @@ class AvailabilityController extends AbstractController
         EntityManagerInterface $em,
         TeamRepository $teamRepository
     ): Response {
-        $team1Id  = $request->request->get('team1_id');
-        $team2Id  = $request->request->get('team2_id');
-        $slot     = $request->request->get('slot');     // "2025-01-13 17:00"
-        $phase    = trim($request->request->get('phase', ''));
-        $court    = trim($request->request->get('court', ''));
+        $team1Id = $request->request->get('team1_id');
+        $team2Id = $request->request->get('team2_id');
+        $slot    = $request->request->get('slot');     // "2025-01-13 17:00"
+        $phase   = trim($request->request->get('phase', ''));
+        $court   = trim($request->request->get('court', ''));
 
         $team1 = $teamRepository->find($team1Id);
         $team2 = $teamRepository->find($team2Id);

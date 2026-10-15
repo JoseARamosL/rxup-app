@@ -28,6 +28,9 @@ class Availability
     #[ORM\Column(type: Types::TIME_MUTABLE)]
     private ?\DateTime $startTime = null;
 
+    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    private ?\DateTime $endTime = null;
+
     public function getId(): ?int { return $this->id; }
 
     public function getTeam(): ?Team { return $this->team; }
@@ -41,4 +44,7 @@ class Availability
 
     public function getStartTime(): ?\DateTime { return $this->startTime; }
     public function setStartTime(\DateTime $startTime): static { $this->startTime = $startTime; return $this; }
+
+    public function getEndTime(): ?\DateTime { return $this->endTime; }
+    public function setEndTime(?\DateTime $endTime): static { $this->endTime = $endTime; return $this; }
 }
