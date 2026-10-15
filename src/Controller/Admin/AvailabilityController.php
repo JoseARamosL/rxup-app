@@ -140,21 +140,18 @@ class AvailabilityController extends AbstractController
             }
         }
 
-        // Partidos ya programados
-        $playedPairs    = [];
-        $teamsWithGame  = [];
+        // Enfrentamientos ya disputados en este torneo
+        $playedPairs = [];
         $games = $gameRepository->findBy(['tournament' => $tournament]);
         foreach ($games as $game) {
             if ($game->getTeam1() && $game->getTeam2()) {
                 $a = min($game->getTeam1()->getId(), $game->getTeam2()->getId());
                 $b = max($game->getTeam1()->getId(), $game->getTeam2()->getId());
                 $playedPairs["{$a}-{$b}"] = true;
-                $teamsWithGame[$game->getTeam1()->getId()] = true;
-                $teamsWithGame[$game->getTeam2()->getId()] = true;
             }
         }
 
-        // Cruce: para cada par sin partido, buscar horas de inicio válidas dentro del solapamiento
+        // Cruce: para cada par que no haya jugado entre sí, buscar horas de inicio válidas
         $suggestions = [];
         $teamsArr = array_values($teams);
         for ($i = 0; $i < count($teamsArr); $i++) {
@@ -165,7 +162,6 @@ class AvailabilityController extends AbstractController
                 $a = min($t1->getId(), $t2->getId());
                 $b = max($t1->getId(), $t2->getId());
                 if (isset($playedPairs["{$a}-{$b}"])) continue;
-                if (isset($teamsWithGame[$t1->getId()]) || isset($teamsWithGame[$t2->getId()])) continue;
 
                 $s1 = $slots[$t1->getId()] ?? [];
                 $s2 = $slots[$t2->getId()] ?? [];
@@ -213,10 +209,9 @@ class AvailabilityController extends AbstractController
 
         $strandedTeams = [];
         foreach ($teams as $team) {
-            $hasSlots        = !empty($slots[$team->getId()]);
-            $inSuggestion    = isset($teamsInSuggestions[$team->getId()]);
-            $alreadyScheduled = isset($teamsWithGame[$team->getId()]);
-            if ($hasSlots && !$inSuggestion && !$alreadyScheduled) {
+            $hasSlots     = !empty($slots[$team->getId()]);
+            $inSuggestion = isset($teamsInSuggestions[$team->getId()]);
+            if ($hasSlots && !$inSuggestion) {
                 $strandedTeams[] = $team;
             }
         }
