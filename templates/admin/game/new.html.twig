@@ -76,6 +76,19 @@
 
             <div class="hidden">{{ form_widget(form.score) }}</div>
 
+            {% if form.vars.errors|length > 0 %}
+                <div class="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                    <div class="flex items-start gap-2">
+                        <i class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0"></i>
+                        <div>
+                            {% for error in form.vars.errors %}
+                                {{ error.message }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
                 <a href="{{ path('app_admin_game_index', {id: tournament.id}) }}"
                    class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">

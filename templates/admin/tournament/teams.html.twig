@@ -11,11 +11,12 @@
         .ts-dropdown { border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); font-size: 0.875rem; }
         .ts-dropdown .option { padding: 0.5rem 0.75rem; }
         .ts-dropdown .option:hover, .ts-dropdown .option.active { background: #f3f4f6; color: #111827; }
+        [x-cloak] { display: none !important; }
     </style>
 {% endblock %}
 
 {% block body %}
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-5xl mx-auto" x-data="{ editOpen: false, editTeamId: null }">
 
         {# Cabecera #}
         <div class="mb-6">
@@ -51,10 +52,16 @@
                                             {{ team.player2.name|slice(0,1)|upper }}
                                         </div>
                                     </div>
-                                    <div>
+                                    <div class="flex-1 min-w-0">
                                         <p class="text-sm font-medium text-gray-900">{{ team.player1.name }}</p>
                                         <p class="text-sm text-gray-500">{{ team.player2.name }}</p>
                                     </div>
+                                    <button type="button"
+                                            @click="editTeamId = {{ team.id }}; editOpen = true"
+                                            class="shrink-0 p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+                                            title="Editar pareja">
+                                        <i class="fa-solid fa-pen text-xs"></i>
+                                    </button>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -80,6 +87,50 @@
             </div>
 
         </div>
+
+        {# Modal de edición #}
+        <div x-show="editOpen"
+             x-cloak
+             x-transition.opacity
+             class="fixed inset-0 z-50 flex items-center justify-center p-4"
+             role="dialog" aria-modal="true">
+
+            <div @click="editOpen = false" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+
+            <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" @click.stop>
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-base font-semibold text-gray-900">Editar pareja</h3>
+                    <button type="button" @click="editOpen = false"
+                            class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                {% for team in teams %}
+                    <div x-show="editTeamId === {{ team.id }}">
+                        {{ form_start(editForms[team.id], {'attr': {'class': 'space-y-4'}}) }}
+                            {{ form_row(editForms[team.id].player1, {
+                                'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-1.5'}
+                            }) }}
+                            {{ form_row(editForms[team.id].player2, {
+                                'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-1.5'}
+                            }) }}
+                            <div class="flex gap-3 pt-2">
+                                <button type="button" @click="editOpen = false"
+                                        class="flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                    Cancelar
+                                </button>
+                                <button type="submit"
+                                        class="flex-1 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors">
+                                    Guardar
+                                </button>
+                            </div>
+                        {{ form_end(editForms[team.id]) }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
     </div>
 {% endblock %}
 

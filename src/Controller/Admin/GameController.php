@@ -17,6 +17,7 @@ use App\Repository\TeamRepository;
 use App\Service\RankingCalculator;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\FormError;
 
 #[Route('/admin/tournament/{id}/games')]
 class GameController extends AbstractController
@@ -79,19 +80,33 @@ class GameController extends AbstractController
     }
 
     #[Route('/new', name: 'app_admin_game_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, Tournament $tournament, EntityManagerInterface $entityManager): Response
-    {
+    public function new(
+        Request $request,
+        Tournament $tournament,
+        EntityManagerInterface $entityManager,
+        GameRepository $gameRepository
+    ): Response {
         $game = new Game();
-        $game->setTournament($tournament); // Vinculamos automáticamente al torneo actual
+        $game->setTournament($tournament);
 
         $form = $this->createForm(GameType::class, $game);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($game);
-            $entityManager->flush();
+            $team1 = $game->getTeam1();
+            $team2 = $game->getTeam2();
 
-            return $this->redirectToRoute('app_admin_game_index', ['id' => $tournament->getId()]);
+            $duplicate = $gameRepository->findDuplicate($tournament, $team1, $team2);
+
+            if ($duplicate) {
+                $t1 = $team1->getPlayer1()->getName() . ' / ' . $team1->getPlayer2()->getName();
+                $t2 = $team2->getPlayer1()->getName() . ' / ' . $team2->getPlayer2()->getName();
+                $form->addError(new FormError("Este partido ya existe en esta liga: {$t1} vs {$t2}."));
+            } else {
+                $entityManager->persist($game);
+                $entityManager->flush();
+                return $this->redirectToRoute('app_admin_game_index', ['id' => $tournament->getId()]);
+            }
         }
 
         return $this->render('admin/game/new.html.twig', [

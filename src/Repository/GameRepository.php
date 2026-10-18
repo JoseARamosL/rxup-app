@@ -16,28 +16,16 @@ class GameRepository extends ServiceEntityRepository
         parent::__construct($registry, Game::class);
     }
 
-    //    /**
-    //     * @return Game[] Returns an array of Game objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('g.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Game
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findDuplicate(\App\Entity\Tournament $tournament, \App\Entity\Team $team1, \App\Entity\Team $team2): ?Game
+    {
+        return $this->createQueryBuilder('g')
+            ->where('g.tournament = :tournament')
+            ->andWhere('(g.team1 = :t1 AND g.team2 = :t2) OR (g.team1 = :t2 AND g.team2 = :t1)')
+            ->setParameter('tournament', $tournament)
+            ->setParameter('t1', $team1)
+            ->setParameter('t2', $team2)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
